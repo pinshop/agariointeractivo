@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Battle - Agario Style</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"
+        crossorigin="anonymous"></script>
+    <script src="connection.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d0d0d;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            max-width: 100vw;
+            width: 100vw;
+        }
+
+        .inputFields {
+            padding: 10px;
+            background: rgba(20, 20, 20, 0.9);
+            border-bottom: 2px solid #333;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .inputFields input[type="text"] {
+            padding: 6px 12px;
+            font-size: 0.9em;
+            border-radius: 15px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            outline: none;
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        .inputFields input[type="button"] {
+            padding: 6px 16px;
+            font-size: 0.9em;
+            border-radius: 15px;
+            border: none;
+            background: #fe2c55;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .inputFields input[type="button"]:hover {
+            background: #e02045;
+        }
+
+        #stateText {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #aaa;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            max-width: 100vw;
+            width: 100vw;
+        }
+
+        /* Leaderboards */
+        .leaderboard {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            color: white;
+            z-index: 100;
+            min-width: 160px;
+            max-width: 200px;
+            cursor: move;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+            /* Enable dragging */
+            user-select: none;
+        }
+
+        .leaderboard h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            /* Header bg */
+        }
+
+        .leaderboard ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .leaderboard li {
+            padding: 2px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .leaderboard li span.name {
+            font-weight: bold;
+            max-width: 90px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #lb-survival {
+            top: 80px;
+            left: 10px;
+        }
+
+        #lb-killers {
+            top: 80px;
+            right: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .inputFields {
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .inputFields input[type="text"] {
+                font-size: 0.8em;
+                padding: 5px 10px;
+                min-width: 100px;
+            }
+
+            .inputFields input[type="button"] {
+                font-size: 0.8em;
+                padding: 5px 12px;
+            }
+
+            #stateText {
+                font-size: 0.8em;
+                margin-left: 5px;
+            }
+
+            .leaderboard {
+                min-width: 140px;
+                max-width: 160px;
+                padding: 6px;
+            }
+
+            .leaderboard h3 {
+                font-size: 12px;
+            }
+
+            .leaderboard ol {
+                font-size: 11px;
+            }
+
+            .leaderboard li span.name {
+                max-width: 70px;
+            }
+
+            #lb-survival,
+            #lb-killers {
+                top: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .inputFields {
+                padding: 6px;
+                gap: 4px;
+            }
+
+            .inputFields span {
+                display: none;
+            }
+
+            .inputFields input[type="text"]::placeholder {
+                color: #888;
+            }
+
+            .leaderboard {
+                min-width: 120px;
+                max-width: 140px;
+                padding: 4px;
+            }
+
+            #lb-survival {
+                left: 5px;
+            }
+
+            #lb-killers {
+                right: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="inputFields">
+        <span>TikTok Live:</span>
+        <input type="text" id="uniqueIdInput" placeholder="@username">
+        <input type="button" id="connectButton" value="Conectar">
+        <span id="stateText">Desconectado</span>
+    </div>
+
+    <div id="lb-survival" class="leaderboard">
+        <h3>🏆 Top 3 Vivos</h3>
+        <ol id="list-survival">
+            <!-- Items injected by JS -->
+        </ol>
+    </div>
+
+    <div id="lb-killers" class="leaderboard">
+        <h3>⚔️ Top 5 Killers</h3>
+        <ol id="list-killers">
+            <!-- Items injected by JS -->
+        </ol>
+    </div>
+
+    <canvas id="game"></canvas>
+
+    <script>
+        /* ========== CONEXIÓN TIKTOK (Inalterada) ========== */
+        let backendUrl = location.protocol === 'file:' ? "https://tiktok-chat-reader.zerody.one/" : undefined;
+        let connection = new TikTokIOConnection(backendUrl);
+
+        // SONIDOS
+        const spawnSound = new Audio("aparecer.mp3");
+        const followSound = new Audio("seguir.mp3");
+        const likeSound = new Audio("tap.mp3");
+        const damageGlobalSound = new Audio("rose.mp3");
+        const healMassiveSound = new Audio("crecer.mp3");
+        const auraSound = new Audio("aura.mp3");
+        const wipeoutSound = new Audio("wipeout.mp3");
+        const laserSound = new Audio("rayo.mp3");
+        const extremeLifeSound = new Audio("10000.mp3");
+        const deadSound = new Audio("dead.mp3");
+        const boingSound = new Audio("boing.mp3");
+        const fuerzaSound = new Audio("fuerza.mp3");
+        const balaSound = new Audio("bala.mp3");
+        const imanSound = new Audio("iman.mp3");
+        const siuSound = new Audio("siu.mp3");
+
+        $("#connectButton").click(connect);
+        $("#uniqueIdInput").on("keyup", e => { if (e.key === "Enter") connect(); });
+
+        function connect() {
+            let username = $("#uniqueIdInput").val().trim();
+            if (!username) { alert("Escribe un usuario"); return; }
+            $("#stateText").text("Conectando...");
+            connection.connect(username)
+                .then(state => {
+                    $("#stateText").text(`Conectado a roomId ${state.roomId}`).css("color", "#25f4ee");
+                    balls = [];
+                    particles = [];
+                    texts = [];
+                    bombs = [];
+                    lasers = [];
+                })
+                .catch(err => $("#stateText").text("Error: " + err).css("color", "red"));
+        }
+
+        /* ========== AGARIO GAME ENGINE ========== */
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.onresize = resize;
+        resize();
+
+        // --- SISTEMA DE PARTÍCULAS ---
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 3;
+                let angle = Math.random() * Math.PI * 2;
+                let speed = Math.random() * 5 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.color = color;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+                this.life -= this.decay;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+        let particles = [];
+
+        // --- TEXTOS FLOTANTES ---
+        class FloatingText {
+            constructor(x, y, text, color) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.life = 1.0;
+                this.vy = -1.5;
+            }
+            update() {
+                this.y += this.vy;
+                this.life -= 0.015;
+            }
+            draw() {
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.font = "bold 28px Arial";
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 4;
+                ctx.strokeStyle = "rgba(0,0,0,0.5)";
+                ctx.lineWidth = 3;
+                ctx.strokeText(this.text, this.x, this.y);
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1.0;
+            }
+        }
+        let texts = [];
+
+        // --- RAYO LÁSER (ID 5487) ---
+        class Laser {
+            constructor(x, y, angle, ownerId) {
+                this.ownerId = ownerId;
+                this.segments = [];
+                this.life = 1.0; // Duración visual (alpha)
+                this.damagedIds = new Set(); // Para no dañar al mismo objetivo múltiples veces en un frame
+
+                // Calcular trayectoria instantánea completa (con 1 rebote)
+                this.calculatePath(x, y, angle);
+            }
+
+            calculatePath(startX, startY, angle) {
+                let currentX = startX;
+                let currentY = startY;
+                let currentAngle = angle;
+
+                // Máximo 2 segmentos (Original + 1 Rebote)
+                for (let i = 0; i < 2; i++) {
+                    let dirX = Math.cos(currentAngle);
+                    let dirY = Math.sin(currentAngle);
+
+                    // Encontrar intersección con paredes
+                    // Paredes: x=0, x=W, y=0, y=H
+                    let tMin = Infinity;
+                    let hitWall = null; // 'left', 'right', 'top', 'bottom'
+
+                    // Wall Left (x=0)
+                    if (dirX < 0) {
+                        let t = (0 - currentX) / dirX;
+                        if (t < tMin) { tMin = t; hitWall = 'vert'; }
+                    }
+                    // Wall Right
+                    if (dirX > 0) {
+                        let t = (canvas.width - currentX) / dirX;
+                        if (t < tMin) { tMin = t; hitWall = 'vert'; }
+                    }
+                    // Wall Top
+                    if (dirY < 0) {
+                        let t = (0 - currentY) / dirY;
+                        if (t < tMin) { tMin = t; hitWall = 'horz'; }
+                    }
+                    // Wall Bottom
+                    if (dirY > 0) {
+                        let t = (canvas.height - currentY) / dirY;
+                        if (t < tMin) { tMin = t; hitWall = 'horz'; }
+                    }
+
+                    let endX = currentX + dirX * tMin;
+                    let endY = currentY + dirY * tMin;
+
+                    this.segments.push({
+                        x1: currentX, y1: currentY,
+                        x2: endX, y2: endY
+                    });
+
+                    // Aplicar Daño en este segmento
+                    this.checkCollisions(currentX, currentY, endX, endY);
+
+                    // Preparar siguiente rebote
+                    currentX = endX;
+                    currentY = endY;
+
+                    if (hitWall === 'vert') {
+                        dirX *= -1;
+                        currentAngle = Math.atan2(dirY, dirX);
+                    } else if (hitWall === 'horz') {
+                        dirY *= -1;
+                        currentAngle = Math.atan2(dirY, dirX);
+                    }
+                }
+            }
+
+            checkCollisions(x1, y1, x2, y2) {
+                balls.forEach(b => {
+                    // Evitar auto-daño o múltiples hits
+                    if (this.damagedIds.has(b.uniqueId)) return;
+
+                    // Distancia punto-segmento
+                    // https://stackoverflow.com/a/6853926
+                    let A = x1 - b.x;
+                    let B = y1 - b.y;
+                    let C = x2 - x1;
+                    let D = y2 - y1;
+
+                    let dot = A * C + B * D;
+                    let len_sq = C * C + D * D;
+                    let param = -1;
+                    if (len_sq != 0) // in case of 0 length line
+                        param = -dot / len_sq;
+
+                    let xx, yy;
+
+                    if (param < 0) {
+                        xx = x1; yy = y1;
+                    } else if (param > 1) {
+                        xx = x2; yy = y2;
+                    } else {
+                        xx = x1 + param * C;
+                        yy = y1 + param * D;
+                    }
+
+                    let dx = b.x - xx;
+                    let dy = b.y - yy;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < b.radius) {
+                        // Evitar auto-daño
+                        if (b.uniqueId === this.ownerId) return;
+
+                        b.life -= 30;
+                        b.lastAttackerId = this.ownerId; // Registrar Killer
+                        texts.push(new FloatingText(b.x, b.y - b.radius, "-30", "#FF00FF"));
+                        this.damagedIds.add(b.uniqueId);
+
+                        // Efecto de impacto
+                        for (let i = 0; i < 5; i++) particles.push(new Particle(xx, yy, "#00FFFF"));
+                    }
+                });
+            }
+
+            update() {
+                this.life -= 0.05;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.lineWidth = 10 * this.life;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "#00FFFF";
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "#00FFFF";
+
+                ctx.beginPath();
+                this.segments.forEach(seg => {
+                    ctx.moveTo(seg.x1, seg.y1);
+                    ctx.lineTo(seg.x2, seg.y2);
+                });
+                ctx.stroke();
+
+                // Core blanco más fino
+                ctx.lineWidth = 4 * this.life;
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+        let lasers = [];
+
+        // --- JUGADORES (ESFERAS) ---
+        let balls = [];
+        let totalDeathCount = 0; // Contador total de muertes acumulado
+        const BASE_RADIUS = 30; // Tamaño base para 100 de vida (o menos)
+        // No hay MAX_RADIUS fijo, escala hasta 1000 vida
+
+        class Ball {
+            constructor(uniqueId, avatarUrl) {
+                this.uniqueId = uniqueId;
+                this.life = 100;
+                this.radius = BASE_RADIUS;
+                this.targetRadius = BASE_RADIUS;
+
+                this.lastDamageTime = 0;
+
+                this.x = Math.random() * (canvas.width - 100) + 50;
+                this.y = Math.random() * (canvas.height - 150) + 100;
+
+                // Masa proporcional a radio^2
+                this.mass = this.radius * this.radius;
+
+                let angle = Math.random() * Math.PI * 2;
+                let speed = 2 + Math.random() * 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+
+                this.img = new Image();
+                this.img.src = avatarUrl || `https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/7d23fcw8d0e0a0d4_100x100.jpeg?x-expires=1688500000&x-signature=random`;
+                this.imgLoaded = false;
+                this.img.onload = () => { this.imgLoaded = true; };
+
+                this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                this.isGlow = false;
+                this.glowTimer = 0;
+
+                // Bonus Props
+                this.likeCount = 0;
+                this.hasGoldenAura = false;
+
+                // Stats
+                this.spawnTime = Date.now();
+                this.kills = 0;
+                this.lastAttackerId = null;
+
+                // Propiedades de poder aumentado
+                this.isPowered = false;
+                this.powerEndTime = 0;
+                this.damageMultiplier = 1;
+
+                // Propiedades de imán
+                this.isMagnetized = false;
+                this.magnetOwner = null;
+                this.magnetEndTime = 0;
+                this.originalVx = 0;
+                this.originalVy = 0;
+
+                // Propiedades de velocidad y congelación
+                this.isSpeedBoosted = false;
+                this.speedEndTime = 0;
+                this.isFrozen = false;
+                this.freezeEndTime = 0;
+                this.freezeDamageTimer = 0;
+            }
+
+            // Calcular radio objetivo basado en vida
+            updateRadius() {
+                // Vida 100 -> Escala 1.0 (BASE_RADIUS = 30)
+                // Vida 1000 -> Escala 10.0 (300px)
+
+                // Cap de tamaño visual = 3 veces el radio inicial
+                // BASE_RADIUS = 30 -> Max 90
+                // Vida 300 -> Escala 3.0
+                let visualLife = Math.min(this.life, 300);
+                visualLife = Math.max(10, visualLife);
+
+                let scale = visualLife / 100; // 0.1 a 3.0
+
+                if (visualLife < 100) scale = 0.5 + (visualLife / 200);
+
+                let calculatedRadius = BASE_RADIUS * scale;
+
+                // Limite absoluto visual
+                this.targetRadius = Math.min(calculatedRadius, BASE_RADIUS * 3);
+            }
+
+            takeDamage() {
+                if (Date.now() - this.lastDamageTime > 50) {
+                    this.life--;
+                    this.lastDamageTime = Date.now();
+                }
+            }
+
+            forceDamage(amount) {
+                // Daño forzado (bombas, scripts) sí afecta, o podemos hacerlo inmune también?
+                // Generalmente power-up es para choques, pero dejemos que fuerza mayor sí dañe.
+                this.life -= amount;
+                texts.push(new FloatingText(this.x, this.y - this.radius, `-${amount}`, "#FF3333"));
+            }
+
+            heal(amount) {
+                this.life += amount;
+                this.isGlow = true;
+                this.glowTimer = 20;
+                texts.push(new FloatingText(this.x, this.y - this.radius, `+${amount}`, "#33FF33"));
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // EFECTOS VISUALES
+                if (this.hasGoldenAura) {
+                    // AURA DORADA INFINITA
+                    let pulse = (Math.sin(Date.now() / 200) + 1) / 2;
+                    let glowSize = 20 + pulse * 20;
+                    let glowAlpha = 0.5 + pulse * 0.5;
+
+                    ctx.shadowBlur = glowSize;
+                    ctx.shadowColor = `rgba(255, 215, 0, ${glowAlpha})`;
+
+                    let r = 255;
+                    let g = 215 + (40 * pulse);
+                    let b = 0 + (100 * pulse);
+                    ctx.strokeStyle = `rgb(${r},${g},${b})`;
+                    ctx.lineWidth = 6 + pulse * 2;
+                } else if (this.isGlow) {
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = "gold";
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 4;
+                } else {
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 4;
+                }
+
+                // Borde
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Avatar
+                if (this.imgLoaded) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius - 2, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(this.img, -this.radius, -this.radius, this.radius * 2, this.radius * 2);
+                    ctx.restore();
+                }
+
+                // Color de Vida
+                let lifeColor = "#00FF00";
+                if (this.life < 50) lifeColor = "#FFFF00";
+                if (this.life < 30) lifeColor = "#FF0000";
+
+                // CONTADOR DE VIDA
+                // Si es max size (>= 300 radio o >1000 vida), fuente 20% más grande (16px * 1.2 = ~19px -> 20px)
+                let fontSize = this.radius >= 299 ? "20px" : "16px";
+                ctx.font = `bold ${fontSize} Arial`;
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 4;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "rgba(0,0,0,0.8)";
+                ctx.strokeText(this.life, 0, 0);
+
+                ctx.fillStyle = lifeColor;
+                ctx.shadowBlur = 0;
+                ctx.fillText(this.life, 0, 0);
+
+                ctx.restore();
+
+                // Nombre
+                ctx.font = "bold 14px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 4;
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "black";
+                ctx.strokeText(this.uniqueId, this.x, this.y + this.radius + 5);
+                ctx.fillText(this.uniqueId, this.x, this.y + this.radius + 5);
+                ctx.shadowBlur = 0;
+
+                // Dibujar corona si es el jugador con más vida
+                let highestLifePlayer = getPlayerWithHighestLife();
+                if (highestLifePlayer && this.uniqueId === highestLifePlayer.uniqueId) {
+                    // Dibujar corona arriba de la esfera
+                    ctx.save();
+                    ctx.font = "bold 24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.strokeStyle = "#FFA500";
+                    ctx.lineWidth = 2;
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 8;
+
+                    // Posición de la corona (arriba de la esfera)
+                    let crownY = this.y - this.radius - 20;
+
+                    // Dibujar corona usando emoji o texto
+                    ctx.strokeText("👑", this.x, crownY);
+                    ctx.fillText("👑", this.x, crownY);
+                    ctx.restore();
+                }
+            }
+
+            update() {
+                // Actualizar tamaño objetivo según vida
+                this.updateRadius();
+
+                // INTERPOLACIÓN SUAVE (Lerp) para evitar "titileo"
+                // Se mueve un 10% de la diferencia cada frame
+                if (Math.abs(this.radius - this.targetRadius) > 0.1) {
+                    this.radius += (this.targetRadius - this.radius) * 0.1;
+                    this.mass = this.radius * this.radius;
+                } else {
+                    this.radius = this.targetRadius;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Paredes
+                let hitWall = false;
+                if (this.x - this.radius < 0) {
+                    this.x = this.radius;
+                    this.vx *= -1;
+                    hitWall = true;
+                } else if (this.x + this.radius > canvas.width) {
+                    this.x = canvas.width - this.radius;
+                    this.vx *= -1;
+                    hitWall = true;
+                }
+
+                const topBarHeight = 70;
+                if (this.y - this.radius < topBarHeight) {
+                    this.y = topBarHeight + this.radius;
+                    this.vy *= -1;
+                    hitWall = true;
+                } else if (this.y + this.radius > canvas.height) {
+                    this.y = canvas.height - this.radius;
+                    this.vy *= -1;
+                    hitWall = true;
+                }
+
+                if (hitWall) {
+                    this.takeDamage();
+                    boingSound.cloneNode(true).play().catch(e => console.log(e));
+                }
+
+                if (this.isGlow) {
+                    this.glowTimer--;
+                    if (this.glowTimer <= 0) this.isGlow = false;
+                }
+
+                // Verificar si el poder aumentado ha expirado
+                if (this.isPowered && Date.now() > this.powerEndTime) {
+                    this.isPowered = false;
+                    this.damageMultiplier = 1;
+                }
+
+                // Verificar si el imán ha expirado
+                if (this.isMagnetized && Date.now() > this.magnetEndTime) {
+                    this.isMagnetized = false;
+                    this.magnetOwner = null;
+                    this.vx = this.originalVx;
+                    this.vy = this.originalVy;
+                }
+
+                // Verificar si la velocidad aumentada ha expirado
+                if (this.isSpeedBoosted && Date.now() > this.speedEndTime) {
+                    this.isSpeedBoosted = false;
+                }
+
+                // Verificar si la congelación ha expirado
+                if (this.isFrozen && Date.now() > this.freezeEndTime) {
+                    this.isFrozen = false;
+                    this.freezeDamageTimer = 0;
+                }
+            }
+        }
+
+        function getPlayerWithHighestLife() {
+            if (balls.length === 0) return null;
+            return balls.reduce((prev, current) => (prev.life > current.life) ? prev : current);
+        }
+
+        // ... (rest of the code remains the same)
+        function resolveCollisions() {
+            for (let i = 0; i < balls.length; i++) {
+                for (let j = i + 1; j < balls.length; j++) {
+                    let b1 = balls[i];
+                    let b2 = balls[j];
+
+                    let dx = b2.x - b1.x;
+                    let dy = b2.y - b1.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let minDist = b1.radius + b2.radius;
+
+                    if (distance < minDist) {
+                        // Sonido de colisión
+                        boingSound.cloneNode(true).play().catch(e => console.log(e));
+
+                        // Aplicar daño con multiplicador si está powered
+                        let damage1 = b1.isPowered ? 3 : 1;
+                        let damage2 = b2.isPowered ? 3 : 1;
+
+                        // Aplicar daño a cada jugador
+                        for (let i = 0; i < damage1; i++) b1.takeDamage();
+                        for (let i = 0; i < damage2; i++) b2.takeDamage();
+
+                        // Registrar atacante (último contacto)
+                        b1.lastAttackerId = b2.uniqueId;
+                        b2.lastAttackerId = b1.uniqueId;
+
+                        // Si uno tiene boost, empuja con más fuerza (masa efectiva mayor para el calculo?)
+                        // O simplemente la velocidad alta ya hace el trabajo.
+                        // Physics normal de rebote:
+
+                        let nx = dx / distance;
+                        let ny = dy / distance;
+
+                        let overlap = minDist - distance;
+                        let totalMass = b1.mass + b2.mass;
+                        let r1 = b2.mass / totalMass;
+                        let r2 = b1.mass / totalMass;
+
+                        b1.x -= nx * overlap * r1;
+                        b1.y -= ny * overlap * r1;
+                        b2.x += nx * overlap * r2;
+                        b2.y += ny * overlap * r2;
+
+                        let k = -2 * ((b2.vx - b1.vx) * nx + (b2.vy - b1.vy) * ny) / (1 / b1.mass + 1 / b2.mass);
+
+                        b1.vx -= k * (1 / b1.mass) * nx;
+                        b1.vy -= k * (1 / b1.mass) * ny;
+                        b2.vx += k * (1 / b2.mass) * nx;
+                        b2.vy += k * (1 / b2.mass) * ny;
+                    }
+                }
+            }
+        }
+
+        function spawnBall(uniqueId, avatarUrl) {
+            if (!avatarUrl && !uniqueId) return;
+
+            let existing = balls.find(b => b.uniqueId === uniqueId);
+            if (existing) {
+                existing.isGlow = true;
+                existing.glowTimer = 30;
+                return;
+            }
+
+            balls.push(new Ball(uniqueId, avatarUrl));
+
+            // Sonido de aparición
+            spawnSound.cloneNode(true).play().catch(e => console.log(e));
+        }
+
+        /* ========== EVENTOS TIKTOK ========== */
+        connection.on("member", data => spawnBall(data.uniqueId, data.profilePictureUrl));
+
+        // FOLLOW -> +20 Vida
+        connection.on("social", data => {
+            if (data.displayType && data.displayType.includes("follow")) {
+                let b = balls.find(ball => ball.uniqueId === data.uniqueId);
+                if (b) {
+                    b.heal(20);
+                    followSound.cloneNode(true).play().catch(e => console.log(e));
+                } else {
+                    spawnBall(data.uniqueId, data.profilePictureUrl);
+                }
+            }
+            if (data.displayType && data.displayType.includes("share")) {
+                // Solo revivir si NO existe. 
+                // Si existe, no hacemos nada (sin brillo ni texto, como pidió el usuario).
+                let existing = balls.find(b => b.uniqueId === data.uniqueId);
+                if (!existing) {
+                    spawnBall(data.uniqueId, data.profilePictureUrl);
+                }
+            }
+        });
+
+        connection.on("chat", data => {
+            // console.log("Chat:", data.comment);
+        });
+
+        // LIKE -> Cada 40 likes +13 vida
+        connection.on("like", data => {
+            let b = balls.find(ball => ball.uniqueId === data.uniqueId);
+            if (b) {
+                let likes = data.likeCount || 0;
+                b.likeCount += likes;
+
+                while (b.likeCount >= 40) {
+                    b.life += 13;
+                    texts.push(new FloatingText(b.x, b.y - b.radius, "+13", "#33FF33"));
+                    likeSound.cloneNode(true).play().catch(e => console.log(e));
+                    b.likeCount -= 40;
+                }
+            }
+        });
+
+        connection.on("gift", data => {
+            let sender = balls.find(ball => ball.uniqueId === data.uniqueId);
+
+            // Si no existe, crearlo
+            if (!sender) {
+                spawnBall(data.uniqueId, data.profilePictureUrl);
+                sender = balls.find(ball => ball.uniqueId === data.uniqueId);
+            }
+
+            if (sender && !data.repeatEnd) {
+                if (data.giftId === 5655) {
+                    // Daño Global
+                    damageGlobalSound.cloneNode(true).play().catch(e => console.log(e));
+                    balls.forEach(target => {
+                        if (target !== sender) {
+                            target.forceDamage(1);
+                        }
+                    });
+                } else if (data.giftId === 5269) {
+                    // CURA MASIVA (+100 VIDAS)
+                    healMassiveSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.heal(100);
+                } else if (data.giftId === 7934) {
+                    // AURA DORADA INFINTA
+                    auraSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.hasGoldenAura = true;
+                    sender.heal(20);
+                } else if (data.giftId === 5879) {
+                    // WIPEOUT (Desaparecer a todos menos al sender)
+                    wipeoutSound.cloneNode(true).play().catch(e => console.log(e));
+                    balls.forEach(target => {
+                        if (target !== sender) {
+                            target.life = 0; // Matar (el loop principal crea la explosión)
+                            target.lastAttackerId = sender.uniqueId;
+                            texts.push(new FloatingText(target.x, target.y, "☠️", "#FF0000"));
+                        }
+                    });
+                    // Efecto visual para el sender
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 20, "¡WIPEOUT!", "#FFD700"));
+                } else if (data.giftId === 5487) {
+                    // LASER BEAM (Rayo con rebote)
+                    laserSound.cloneNode(true).play().catch(e => console.log(e));
+                    // Dirección: Velocidad actual o Aleatoria
+                    let angle = Math.atan2(sender.vy, sender.vx);
+                    if (sender.vx === 0 && sender.vy === 0) angle = Math.random() * Math.PI * 2;
+
+                    lasers.push(new Laser(sender.x, sender.y, angle, sender.uniqueId));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡RAYO!", "#00FFFF"));
+                } else if (data.giftId === 8913) {
+                    // PODER AUMENTADO - Más fuerte y daño 3 por 40s
+                    fuerzaSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.isPowered = true;
+                    sender.powerEndTime = Date.now() + 40000; // 40 segundos
+                    sender.damageMultiplier = 3;
+                    sender.heal(50);
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡PODER AUMENTADO!", "#FF6600"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "Daño x3 por 40s", "#FF3300"));
+                } else if (data.giftId === 7032) {
+                    // ATAQUE A 5 RIVALES ALEATORIOS - 3 de daño a cada uno
+                    balaSound.cloneNode(true).play().catch(e => console.log(e));
+
+                    // Obtener rivales (excluyendo al sender)
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+
+                    // Seleccionar 5 rivales aleatorios (o menos si hay menos jugadores)
+                    let targets = [];
+                    let availableTargets = [...rivals];
+
+                    for (let i = 0; i < Math.min(5, availableTargets.length); i++) {
+                        let randomIndex = Math.floor(Math.random() * availableTargets.length);
+                        targets.push(availableTargets[randomIndex]);
+                        availableTargets.splice(randomIndex, 1);
+                    }
+
+                    // Aplicar 3 de daño a cada objetivo
+                    targets.forEach(target => {
+                        for (let j = 0; j < 3; j++) {
+                            target.takeDamage();
+                        }
+                        target.lastAttackerId = sender.uniqueId;
+                        texts.push(new FloatingText(target.x, target.y - target.radius, "-3", "#FF0000"));
+
+                        // Efecto visual de impacto
+                        for (let k = 0; k < 3; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF0000"));
+                        }
+                    });
+
+                    // Texto de confirmación
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡ATAQUE! (${targets.length})`, "#FF0000"));
+                } else if (data.giftId === 14488) {
+                    // IMÁN DE RIVALES - Atrae a todos los rivales por 3s y les quita 70% de vida
+                    imanSound.cloneNode(true).play().catch(e => console.log(e));
+
+                    // Atraer a todos los rivales
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+
+                    rivals.forEach(target => {
+                        // Guardar velocidad original
+                        target.originalVx = target.vx;
+                        target.originalVy = target.vy;
+
+                        // Marcar como magnetizado
+                        target.isMagnetized = true;
+                        target.magnetOwner = sender.uniqueId;
+                        target.magnetEndTime = Date.now() + 3000; // 3 segundos
+
+                        // Aplicar 70% de daño
+                        let damageAmount = Math.floor(target.life * 0.7);
+                        for (let i = 0; i < damageAmount; i++) {
+                            target.takeDamage();
+                        }
+                        target.lastAttackerId = sender.uniqueId;
+
+                        // Texto de daño
+                        texts.push(new FloatingText(target.x, target.y - target.radius, `-${damageAmount}`, "#FF00FF"));
+
+                        // Efectos visuales
+                        for (let k = 0; k < 5; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
+                        }
+                    });
+
+                    // Texto de confirmación
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡IMÁN! (${rivals.length})`, "#FF00FF"));
+                } else if (data.giftId === 6427) {
+                    // SIUUU - Velocidad aumentada por 1min y congela a rivales por 25s
+                    siuSound.cloneNode(true).play().catch(e => console.log(e));
+
+                    // Dar velocidad aumentada al sender por 1 minuto
+                    sender.isSpeedBoosted = true;
+                    sender.speedEndTime = Date.now() + 60000; // 1 minuto
+
+                    // Congelar a todos los rivales por 25 segundos
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+
+                    rivals.forEach(target => {
+                        target.isFrozen = true;
+                        target.freezeEndTime = Date.now() + 25000; // 25 segundos
+                        target.freezeDamageTimer = Date.now(); // Iniciar timer para daño por segundo
+                        target.lastAttackerId = sender.uniqueId;
+
+                        // Efectos visuales de congelación
+                        for (let k = 0; k < 5; k++) {
+                            particles.push(new Particle(target.x, target.y, "#00FFFF"));
+                        }
+                    });
+
+                    // Textos de confirmación
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡SIUUUU!", "#00FFFF"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "¡VELOCIDAD MÁXIMA!", "#00AAFF"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 50, `¡CONGELADOS! (${rivals.length})`, "#00FFFF"));
+                } else {
+                    // console.log("Gift desconocido:", data.giftId);
+                }
+            }
+        });
+
+        function spawnExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        /* ========== LOOP PRINCIPAL ========== */
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Grid
+            ctx.strokeStyle = "#1a1a1a";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let x = 0; x < canvas.width; x += 100) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
+            for (let y = 0; y < canvas.height; y += 100) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
+            ctx.stroke();
+
+            // Actualizar Bolas y Textos
+            balls.forEach(b => b.update());
+
+            // Aplicar atracción magnética
+            balls.forEach(ball => {
+                if (ball.isMagnetized && ball.magnetOwner) {
+                    let owner = balls.find(b => b.uniqueId === ball.magnetOwner);
+                    if (owner) {
+                        // Calcular dirección hacia el owner
+                        let dx = owner.x - ball.x;
+                        let dy = owner.y - ball.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance > 0) {
+                            // Fuerza de atracción (más fuerte cuando está cerca)
+                            let force = Math.min(8, 200 / distance);
+                            let nx = (dx / distance) * force;
+                            let ny = (dy / distance) * force;
+
+                            // Aplicar velocidad hacia el owner
+                            ball.vx = nx;
+                            ball.vy = ny;
+                        }
+                    }
+                }
+
+                // Aplicar velocidad aumentada
+                if (ball.isSpeedBoosted) {
+                    let speedMultiplier = 3; // 3x más rápido
+                    ball.vx *= speedMultiplier;
+                    ball.vy *= speedMultiplier;
+                }
+
+                // Aplicar congelación y daño por segundo
+                if (ball.isFrozen) {
+                    // Detener movimiento
+                    ball.vx = 0;
+                    ball.vy = 0;
+
+                    // Aplicar 1 daño cada segundo
+                    if (Date.now() - ball.freezeDamageTimer >= 1000) {
+                        ball.takeDamage();
+                        ball.freezeDamageTimer = Date.now();
+                        texts.push(new FloatingText(ball.x, ball.y - ball.radius, "-1❄️", "#00FFFF"));
+
+                        // Efecto visual de daño por hielo
+                        for (let k = 0; k < 2; k++) {
+                            particles.push(new Particle(ball.x, ball.y, "#00FFFF"));
+                        }
+                    }
+                }
+            });
+
+            resolveCollisions();
+
+            // Filtrar Muertos y Spawmear Explosión
+            for (let i = balls.length - 1; i >= 0; i--) {
+                if (balls[i].life <= 0) {
+
+                    // ----- GUARDAR HISTÓRICO DE SUPERVIVENCIA -----
+                    let deadPlayerTime = {
+                        uniqueId: balls[i].uniqueId,
+                        survivalTime: Date.now() - balls[i].spawnTime,
+                        spawnTime: balls[i].spawnTime
+                    };
+
+                    let existingTimeRecord = survivalHallOfFame.find(p => p.uniqueId === deadPlayerTime.uniqueId);
+                    if (!existingTimeRecord || deadPlayerTime.survivalTime > existingTimeRecord.survivalTime) {
+                        survivalHallOfFame = survivalHallOfFame.filter(p => p.uniqueId !== deadPlayerTime.uniqueId);
+                        survivalHallOfFame.push(deadPlayerTime);
+                    }
+
+                    // ----- GUARDAR HISTÓRICO DE KILLS -----
+                    let deadPlayerKills = {
+                        uniqueId: balls[i].uniqueId,
+                        kills: balls[i].kills
+                    };
+
+                    let existingKillsRecord = killersHallOfFame.find(p => p.uniqueId === deadPlayerKills.uniqueId);
+                    if (!existingKillsRecord || deadPlayerKills.kills > existingKillsRecord.kills) {
+                        killersHallOfFame = killersHallOfFame.filter(p => p.uniqueId !== deadPlayerKills.uniqueId);
+                        killersHallOfFame.push(deadPlayerKills);
+                    }
+
+                    // Credit Kill logic
+                    if (balls[i].lastAttackerId) {
+                        let killer = balls.find(b => b.uniqueId === balls[i].lastAttackerId);
+                        if (killer) {
+                            killer.kills++;
+                            // Sin cura por kill
+                        }
+                    }
+
+                    spawnExplosion(balls[i].x, balls[i].y, balls[i].color);
+                    deadSound.cloneNode(true).play().catch(e => console.log(e));
+                    balls.splice(i, 1);
+                }
+            }
+
+            balls.forEach(b => b.draw());
+
+            // Textos Flotantes
+            for (let i = texts.length - 1; i >= 0; i--) {
+                let t = texts[i];
+                t.update();
+                if (t.life <= 0) texts.splice(i, 1);
+                else t.draw();
+            }
+
+            // Partículas
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                if (p.life <= 0) particles.splice(i, 1);
+                else p.draw();
+            }
+
+            // Láseres (Rayos)
+            for (let i = lasers.length - 1; i >= 0; i--) {
+                let l = lasers[i];
+                l.update();
+                l.draw(); // Draw over everything? O under balls? Over se ve mejor.
+                if (l.life <= 0) lasers.splice(i, 1);
+            }
+
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        /* ========== LEADERBOARDS & UI ========== */
+        // Histórico de mejores tiempos de supervivencia
+        let survivalHallOfFame = [];
+        // Histórico de asesinatos (Kills) acumulados a lo largo de la sesión
+        let killersHallOfFame = [];
+
+        function updateLeaderboards() {
+            // ----- 1. LÓGICA TOP SUPERVIVENCIA -----
+            // Actualizar tiempos de jugadores vivos
+            let currentPlayers = [...balls].map(b => ({
+                uniqueId: b.uniqueId,
+                survivalTime: Date.now() - b.spawnTime,
+                spawnTime: b.spawnTime
+            }));
+
+            // Combinar con el histórico y mantener los mejores tiempos
+            let allSurvivalTimes = [...survivalHallOfFame, ...currentPlayers];
+
+            // Eliminar duplicados (mantener el mejor tiempo de cada jugador)
+            let uniqueBestTimes = {};
+            allSurvivalTimes.forEach(player => {
+                if (!uniqueBestTimes[player.uniqueId] || player.survivalTime > uniqueBestTimes[player.uniqueId].survivalTime) {
+                    uniqueBestTimes[player.uniqueId] = player;
+                }
+            });
+
+            // Convertir a array y ordenar por tiempo de supervivencia (mayor primero)
+            let sortedByTime = Object.values(uniqueBestTimes).sort((a, b) => b.survivalTime - a.survivalTime);
+            let top3Time = sortedByTime.slice(0, 3);
+
+            let htmlTime = "";
+            top3Time.forEach((player, i) => {
+                let seconds = Math.floor(player.survivalTime / 1000);
+                let mins = Math.floor(seconds / 60);
+                let secs = seconds % 60;
+                let timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+                let isAlive = balls.some(b => b.uniqueId === player.uniqueId);
+                let status = isAlive ? "🟢" : "💀";
+                htmlTime += `<li><span class="name">${i + 1}. ${player.uniqueId} ${status}</span> <span>${timeStr}</span></li>`;
+            });
+            document.getElementById("list-survival").innerHTML = htmlTime;
+
+            // ----- 2. LÓGICA TOP KILLERS (ACUMULATIVA/PERSISTENTE) -----
+            // Mapear los kills actuales de los jugadores vivos
+            let currentKills = [...balls].map(b => ({
+                uniqueId: b.uniqueId,
+                kills: b.kills
+            }));
+
+            // Combinar el histórico de muertos con los vivos
+            let allKills = [...killersHallOfFame, ...currentKills];
+
+            let uniqueBestKills = {};
+            allKills.forEach(player => {
+                // Siempre mantenemos el conteo mayor de kills para dicho uniqueId
+                if (!uniqueBestKills[player.uniqueId] || player.kills > uniqueBestKills[player.uniqueId].kills) {
+                    uniqueBestKills[player.uniqueId] = player;
+                }
+            });
+
+            // Ordenar todos los jugadores registrados por la cantidad de Kills
+            let sortedByKills = Object.values(uniqueBestKills).sort((a, b) => b.kills - a.kills);
+            let top5Kills = sortedByKills.slice(0, 5);
+
+            let htmlKills = "";
+            top5Kills.forEach((p, i) => {
+                htmlKills += `<li><span class="name">${i + 1}. ${p.uniqueId}</span> <span>⚔️ ${p.kills}</span></li>`;
+            });
+            document.getElementById("list-killers").innerHTML = htmlKills;
+        }
+        setInterval(updateLeaderboards, 1000);
+
+        // Make Draggable
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elmnt.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        makeDraggable(document.getElementById("lb-survival"));
+        makeDraggable(document.getElementById("lb-killers"));
+
+    </script>
+</body>
+
+</html>
