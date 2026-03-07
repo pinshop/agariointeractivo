@@ -247,8 +247,7 @@
 
     <script>
         /* ========== CONEXIÓN TIKTOK (Inalterada) ========== */
-        let backendUrl = location.protocol === 'file:' ? "https://tiktok-chat-reader.zerody.one/" : undefined;
-        let connection = new TikTokIOConnection(backendUrl);
+        let connection = new TikTokIOConnection("https://tiktok-chat-reader.zerody.one/");
 
         // SONIDOS
         const spawnSound = new Audio("aparecer.mp3");
