@@ -83,139 +83,298 @@
             width: 100vw;
         }
 
-        /* Leaderboards */
-        .leaderboard {
+
+        #game-info-board {
             position: absolute;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 8px;
-            color: white;
-            z-index: 100;
-            min-width: 160px;
-            max-width: 200px;
-            cursor: move;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            pointer-events: auto;
-            /* Enable dragging */
-            user-select: none;
-        }
-
-        .leaderboard h3 {
-            margin: 0 0 8px 0;
-            font-size: 14px;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #FFD700;
+            border-radius: 12px;
+            padding: 10px 25px;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            /* Header bg */
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            display: none;
+            user-select: none;
+            pointer-events: auto;
+            cursor: move;
         }
 
-        .leaderboard ol {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 12px;
+        #game-info-board.active {
+            display: block;
         }
 
-        .leaderboard li {
-            padding: 2px 0;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .leaderboard li span.name {
+        #time-display {
+            color: #FFD700;
+            font-size: 36px;
             font-weight: bold;
-            max-width: 90px;
-            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            font-family: monospace;
+            margin-bottom: 5px;
+        }
+
+        #players-display {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #timerButton {
+            background: #ff9800 !important;
+        }
+
+        #timerButton:hover {
+            background: #e68a00 !important;
+        }
+
+        /* --------------------------
+           NEW: Top Killers Board 
+           -------------------------- */
+        #killers-board {
+            position: absolute;
+            top: 150px;
+            right: 20px;
+            width: 175px; /* Reducido al 70% de 250px */
+            min-height: 105px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #FF3333;
+            border-radius: 6px;
+            padding: 7px;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 100;
+            resize: both;
             overflow: hidden;
-            text-overflow: ellipsis;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+            cursor: move;
         }
 
-        #lb-survival {
-            top: 80px;
-            left: 10px;
+        #killers-board .board-header {
+            font-weight: bold;
+            font-size: 13px; /* Reducido de 18px */
+            text-align: center;
+            border-bottom: 1px solid #555;
+            padding-bottom: 3px;
+            margin-bottom: 7px;
+            color: #FF3333;
         }
 
-        #lb-killers {
-            top: 80px;
-            right: 10px;
+        #killers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .inputFields {
-                padding: 8px;
-                gap: 6px;
+        .killer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 8px;
+            border-radius: 5px;
+        }
+
+        .killer-row img {
+            width: 17px; /* Reducido de 24px */
+            height: 17px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 7px;
+        }
+
+        .killer-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            font-size: 11px; /* Letra más pequeña */
+        }
+
+        .killer-score {
+            font-weight: bold;
+            color: #FFD700;
+            font-size: 11px;
+        }
+
+        /* --------------------------
+           NEW: Podium Overlay
+           -------------------------- */
+        #podium-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .podium-title {
+            font-size: 60px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .podium-subtitle {
+            font-size: 30px;
+            color: #FFF;
+            margin-bottom: 40px;
+        }
+
+        #podium-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 30px;
+            height: 300px;
+        }
+
+        .podium-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+        }
+
+        .podium-player img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #FFF;
+            object-fit: cover;
+            margin-bottom: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .podium-rank-box {
+            width: 100%;
+            background: linear-gradient(to top, #333, #555);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .rank-1 .podium-rank-box {
+            height: 200px;
+            background: linear-gradient(to top, #b8860b, #ffd700);
+            color: #000;
+        }
+
+        .rank-1 img {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        .rank-2 .podium-rank-box {
+            height: 150px;
+            background: linear-gradient(to top, #777, #c0c0c0);
+            color: #000;
+        }
+
+        .rank-2 img {
+            border-color: #c0c0c0;
+            box-shadow: 0 0 20px #c0c0c0;
+        }
+
+        .rank-3 .podium-rank-box {
+            height: 100px;
+            background: linear-gradient(to top, #8b4513, #cd7f32);
+            color: #fff;
+        }
+
+        .rank-3 img {
+            border-color: #cd7f32;
+            box-shadow: 0 0 20px #cd7f32;
+        }
+
+        .rank-4 .podium-rank-box,
+        .rank-5 .podium-rank-box {
+            height: 50px;
+            font-size: 25px;
+        }
+
+        .podium-name {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin-top: -30px;
+            /* pull name up */
+            text-shadow: 1px 1px 3px black;
+            z-index: 10;
+        }
+
+        .podium-score {
+            font-size: 16px;
+            color: #FFD700;
+            text-shadow: 1px 1px 3px black;
+            z-index: 10;
+        }
+
+        /* --------------------------
+           NEW: Join Notifications
+           -------------------------- */
+        #join-notifications {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            z-index: 200;
+            pointer-events: none;
+            /* Let clicks pass through if needed */
+        }
+
+        @keyframes fadeUpOut {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-            .inputFields input[type="text"] {
-                font-size: 0.8em;
-                padding: 5px 10px;
-                min-width: 100px;
+            15% {
+                opacity: 1;
+                transform: translateY(0);
             }
 
-            .inputFields input[type="button"] {
-                font-size: 0.8em;
-                padding: 5px 12px;
+            85% {
+                opacity: 1;
+                transform: translateY(0);
             }
 
-            #stateText {
-                font-size: 0.8em;
-                margin-left: 5px;
-            }
-
-            .leaderboard {
-                min-width: 140px;
-                max-width: 160px;
-                padding: 6px;
-            }
-
-            .leaderboard h3 {
-                font-size: 12px;
-            }
-
-            .leaderboard ol {
-                font-size: 11px;
-            }
-
-            .leaderboard li span.name {
-                max-width: 70px;
-            }
-
-            #lb-survival,
-            #lb-killers {
-                top: 70px;
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
             }
         }
 
-        @media (max-width: 480px) {
-            .inputFields {
-                padding: 6px;
-                gap: 4px;
-            }
-
-            .inputFields span {
-                display: none;
-            }
-
-            .inputFields input[type="text"]::placeholder {
-                color: #888;
-            }
-
-            .leaderboard {
-                min-width: 120px;
-                max-width: 140px;
-                padding: 4px;
-            }
-
-            #lb-survival {
-                left: 5px;
-            }
-
-            #lb-killers {
-                right: 5px;
-            }
+        .join-toast {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #FFD700;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            animation: fadeUpOut 2s forwards;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -226,28 +385,50 @@
         <span>TikTok Live:</span>
         <input type="text" id="uniqueIdInput" placeholder="@username">
         <input type="button" id="connectButton" value="Conectar">
+        <select id="timerMinutes"
+            style="padding: 6px; border-radius: 15px; border: 1px solid #444; background: #222; color: #fff; outline: none; font-size: 0.9em; cursor: pointer;">
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="20">20 min</option>
+            <option value="30">30 min</option>
+        </select>
+        <input type="button" id="timerButton" value="Activar Contador">
         <span id="stateText">Desconectado</span>
     </div>
 
-    <div id="lb-survival" class="leaderboard">
-        <h3>🏆 Top 3 Vivos</h3>
-        <ol id="list-survival">
-            <!-- Items injected by JS -->
-        </ol>
+    <div id="game-info-board">
+        <div id="time-display">00:00</div>
+        <div id="players-display">Jugadores: <span id="players-count">0</span></div>
     </div>
 
-    <div id="lb-killers" class="leaderboard">
-        <h3>⚔️ Top 5 Killers</h3>
-        <ol id="list-killers">
-            <!-- Items injected by JS -->
-        </ol>
+    <div id="join-notifications">
+        <!-- New join toasts will go here -->
+    </div>
+
+    <!-- NEW: Top Killers Board -->
+    <div id="killers-board" class="draggable-board">
+        <div class="board-header">Top 5 Killers</div>
+        <div id="killers-list">
+            <!-- Rellenado por JS -->
+        </div>
+    </div>
+
+    <!-- NEW: Podium Overlay (Hidden by default) -->
+    <div id="podium-overlay">
+        <div class="podium-title">¡TIEMPO AGOTADO!</div>
+        <div class="podium-subtitle">TOP 5 PAÍSES </div>
+        <div id="podium-container">
+            <!-- Rellenado por JS -->
+        </div>
     </div>
 
     <canvas id="game"></canvas>
 
     <script>
-        /* ========== CONEXIÓN TIKTOK (Inalterada) ========== */
-        let connection = new TikTokIOConnection("https://tiktok-chat-reader.zerody.one/");
+       let connection = new TikTokIOConnection("https://server-8a5o.onrender.com/");
+
+        
 
         // SONIDOS
         const spawnSound = new Audio("aparecer.mp3");
@@ -257,7 +438,7 @@
         const healMassiveSound = new Audio("crecer.mp3");
         const auraSound = new Audio("aura.mp3");
         const wipeoutSound = new Audio("wipeout.mp3");
-        const laserSound = new Audio("rayo.mp3");
+        const laserSound = new Audio("laser.mp3");
         const extremeLifeSound = new Audio("10000.mp3");
         const deadSound = new Audio("dead.mp3");
         const boingSound = new Audio("boing.mp3");
@@ -265,6 +446,8 @@
         const balaSound = new Audio("bala.mp3");
         const imanSound = new Audio("iman.mp3");
         const siuSound = new Audio("siu.mp3");
+        const spikeSound = new Audio("spike.mp3"); // Nuevo sonido de espinas ROSA
+        const galaxySound = new Audio("galaxy.mp3");
 
         $("#connectButton").click(connect);
         $("#uniqueIdInput").on("keyup", e => { if (e.key === "Enter") connect(); });
@@ -281,6 +464,7 @@
                     texts = [];
                     bombs = [];
                     lasers = [];
+                    initCountries();
                 })
                 .catch(err => $("#stateText").text("Error: " + err).css("color", "red"));
         }
@@ -468,6 +652,9 @@
                         // Evitar auto-daño
                         if (b.uniqueId === this.ownerId) return;
 
+                        // Si el objetivo tiene escudo, no recibe daño del láser
+                        if (b.hasShield) return;
+
                         b.life -= 30;
                         b.lastAttackerId = this.ownerId; // Registrar Killer
                         texts.push(new FloatingText(b.x, b.y - b.radius, "-30", "#FF00FF"));
@@ -480,7 +667,7 @@
             }
 
             update() {
-                this.life -= 0.05;
+                this.life -= 0.0025; // Más lento, dura 400 frames lógicos
             }
 
             draw() {
@@ -513,6 +700,54 @@
         let balls = [];
         let totalDeathCount = 0; // Contador total de muertes acumulado
         const BASE_RADIUS = 30; // Tamaño base para 100 de vida (o menos)
+
+        const countries = [
+            { id: "México", flag: "https://flagcdn.com/w160/mx.png", aliases: ["mexico", "mex"] },
+            { id: "Estados Unidos", flag: "https://flagcdn.com/w160/us.png", aliases: ["estados unidos", "usa", "eeuu", "ee.uu"] },
+            { id: "Colombia", flag: "https://flagcdn.com/w160/co.png", aliases: ["colombia", "col"] },
+            { id: "España", flag: "https://flagcdn.com/w160/es.png", aliases: ["españa", "espana", "esp"] },
+            { id: "Argentina", flag: "https://flagcdn.com/w160/ar.png", aliases: ["argentina", "arg"] },
+            { id: "Perú", flag: "https://flagcdn.com/w160/pe.png", aliases: ["peru", "perú", "per"] },
+            { id: "Venezuela", flag: "https://flagcdn.com/w160/ve.png", aliases: ["venezuela", "ven"] },
+            { id: "Chile", flag: "https://flagcdn.com/w160/cl.png", aliases: ["chile", "chi"] },
+            { id: "Guatemala", flag: "https://flagcdn.com/w160/gt.png", aliases: ["guatemala", "gua"] },
+            { id: "Ecuador", flag: "https://flagcdn.com/w160/ec.png", aliases: ["ecuador", "ecu"] },
+            { id: "Bolivia", flag: "https://flagcdn.com/w160/bo.png", aliases: ["bolivia", "bol"] },
+            { id: "Cuba", flag: "https://flagcdn.com/w160/cu.png", aliases: ["cuba", "cub"] },
+            { id: "República Dominicana", flag: "https://flagcdn.com/w160/do.png", aliases: ["republica dominicana", "república dominicana", "rd", "dominicana"] },
+            { id: "Honduras", flag: "https://flagcdn.com/w160/hn.png", aliases: ["honduras", "hon"] },
+            { id: "Paraguay", flag: "https://flagcdn.com/w160/py.png", aliases: ["paraguay", "par"] },
+            { id: "El Salvador", flag: "https://flagcdn.com/w160/sv.png", aliases: ["el salvador", "salvador"] },
+            { id: "Nicaragua", flag: "https://flagcdn.com/w160/ni.png", aliases: ["nicaragua", "nic"] },
+            { id: "Costa Rica", flag: "https://flagcdn.com/w160/cr.png", aliases: ["costa rica", "cr"] },
+            { id: "Panamá", flag: "https://flagcdn.com/w160/pa.png", aliases: ["panama", "panamá", "pan"] },
+            { id: "Uruguay", flag: "https://flagcdn.com/w160/uy.png", aliases: ["uruguay", "uru"] }
+        ];
+
+        function initCountries() {
+            balls = [];
+            globalPlayerStats = {};
+
+            // Iniciar solo 5 paises aleatorios
+            let shuffled = [...countries].sort(() => 0.5 - Math.random());
+            let selected = shuffled.slice(0, 5);
+
+            selected.forEach(c => {
+                let ball = new Ball(c.id, c.flag);
+                ball.life = 100;
+                balls.push(ball);
+            });
+
+            // Registrar a todos en global stats para no perderlos si se unen luego
+            countries.forEach(c => {
+                globalPlayerStats[c.id] = {
+                    kills: 0,
+                    flag: c.flag,
+                    name: c.id
+                };
+            });
+        }
+
         // No hay MAX_RADIUS fijo, escala hasta 1000 vida
 
         class Ball {
@@ -524,8 +759,18 @@
 
                 this.lastDamageTime = 0;
 
-                this.x = Math.random() * (canvas.width - 100) + 50;
-                this.y = Math.random() * (canvas.height - 150) + 100;
+                let cx = window.innerWidth / 2;
+                let cy = (window.innerHeight + 70) / 2;
+                let radiusX = (window.innerWidth / 2) - 50;
+                let radiusY = Math.min((window.innerHeight - 70) / 2 - 50, radiusX * 0.7);
+                radiusX = Math.max(radiusX, 150);
+                radiusY = Math.max(radiusY, 100);
+
+                let randomAngle = Math.random() * Math.PI * 2;
+                let randomDist = Math.random() * 0.8; // Ratio del 0 al 0.8
+
+                this.x = cx + Math.cos(randomAngle) * (radiusX * randomDist);
+                this.y = cy + Math.sin(randomAngle) * (radiusY * randomDist);
 
                 // Masa proporcional a radio^2
                 this.mass = this.radius * this.radius;
@@ -547,6 +792,7 @@
                 // Bonus Props
                 this.likeCount = 0;
                 this.hasGoldenAura = false;
+                this.goldenAuraEndTime = 0;
 
                 // Stats
                 this.spawnTime = Date.now();
@@ -571,6 +817,20 @@
                 this.isFrozen = false;
                 this.freezeEndTime = 0;
                 this.freezeDamageTimer = 0;
+
+                // Propiedades de Espinas (Spikes)
+                this.spikeCount = 0;
+                this.spikesEndTime = 0;
+                this.spikeAngle = 0;
+                this.spikeType = "normal";
+
+                // Propiedades de Escudo
+                this.hasShield = false;
+                this.shieldEndTime = 0;
+                this.shieldAnimationTime = 0;
+
+                // Propiedades Visuales Extra
+                this.damageFlashTimer = 0;
             }
 
             // Calcular radio objetivo basado en vida
@@ -590,21 +850,29 @@
 
                 let calculatedRadius = BASE_RADIUS * scale;
 
-                // Limite absoluto visual
-                this.targetRadius = Math.min(calculatedRadius, BASE_RADIUS * 3);
+                // Limite absoluto visual (Doble del tamaño original máx)
+                this.targetRadius = Math.min(calculatedRadius, BASE_RADIUS * 2);
             }
 
-            takeDamage() {
+            takeDamage(amount = 1) {
+                // If shield is active, do not take damage
+                if (this.hasShield) return;
+
                 if (Date.now() - this.lastDamageTime > 50) {
-                    this.life--;
+                    this.life -= amount;
                     this.lastDamageTime = Date.now();
+                    this.damageFlashTimer = Date.now() + 150; // Parpadeo rojo agresivo de 150ms al recibir daño continuo
                 }
             }
 
             forceDamage(amount) {
+                // If shield is active, do not take damage even if forced
+                if (this.hasShield) return;
+
                 // Daño forzado (bombas, scripts) sí afecta, o podemos hacerlo inmune también?
                 // Generalmente power-up es para choques, pero dejemos que fuerza mayor sí dañe.
                 this.life -= amount;
+                this.damageFlashTimer = Date.now() + 150;
                 texts.push(new FloatingText(this.x, this.y - this.radius, `-${amount}`, "#FF3333"));
             }
 
@@ -620,7 +888,27 @@
                 ctx.translate(this.x, this.y);
 
                 // EFECTOS VISUALES
-                if (this.hasGoldenAura) {
+                if (this.hasShield) {
+                    // ESCUDO AZUL ANIMADO
+                    let pulse = (Math.sin(this.shieldAnimationTime) + 1) / 2;
+                    let shieldColor = pulse > 0.5 ? "#00AAFF" : "#0088FF"; // Cambia entre azul y celeste
+
+                    ctx.strokeStyle = shieldColor;
+                    ctx.lineWidth = 8 + pulse * 4;
+                    ctx.shadowBlur = 30 + pulse * 20;
+                    ctx.shadowColor = shieldColor;
+
+                    // Dibujar círculo del escudo
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius + 15, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Segundo círculo más pequeño para efecto de profundidad
+                    ctx.lineWidth = 4 + pulse * 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius + 8, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (this.hasGoldenAura) {
                     // AURA DORADA INFINITA
                     let pulse = (Math.sin(Date.now() / 200) + 1) / 2;
                     let glowSize = 20 + pulse * 20;
@@ -645,13 +933,56 @@
                     ctx.lineWidth = 4;
                 }
 
-                // Borde
+                // Borde y Fondo Base
                 ctx.beginPath();
                 ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
+
+                // Si el daño fue reciente (flash rojo)
+                if (Date.now() < this.damageFlashTimer) {
+                    ctx.fillStyle = "#FF0000";
+                } else {
+                    ctx.fillStyle = this.color;
+                }
+
                 ctx.fill();
                 ctx.stroke();
                 ctx.shadowBlur = 0;
+
+                // Dibujar Espinas (Spikes) si están activas
+                if (this.spikeCount > 0) {
+                    ctx.save();
+                    ctx.rotate(this.spikeAngle);
+                    // Animación de extensión/retracción de las espinas usando el tiempo actual
+                    let spikeLength = 15 + Math.sin(Date.now() / 150) * 8;
+
+                    if (this.spikeType === "fire") {
+                        ctx.fillStyle = (Math.floor(Date.now() / 100) % 2 === 0) ? "#FF8C00" : "#FFD700";
+                        ctx.strokeStyle = "#FF4500";
+                    } else if (this.spikeType === "rosa") {
+                        ctx.fillStyle = "#FF1493";
+                        ctx.strokeStyle = "#C71585";
+                    } else {
+                        ctx.fillStyle = "#FF0000";
+                        ctx.strokeStyle = "#8B0000";
+                    }
+
+                    ctx.lineWidth = 2;
+                    ctx.lineJoin = "round";
+                    for (let i = 0; i < this.spikeCount; i++) {
+                        let angle = (i * 2 * Math.PI) / this.spikeCount;
+                        ctx.save();
+                        ctx.rotate(angle);
+                        ctx.beginPath();
+                        ctx.moveTo(this.radius, -5); // base top
+                        ctx.lineTo(this.radius + spikeLength, 0); // punta
+                        ctx.lineTo(this.radius, 5); // base bottom
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                    ctx.restore();
+                }
 
                 // Avatar
                 if (this.imgLoaded) {
@@ -680,26 +1011,20 @@
                 ctx.shadowBlur = 4;
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = "rgba(0,0,0,0.8)";
-                ctx.strokeText(this.life, 0, 0);
+                ctx.strokeText(this.life, 0, -8);
 
                 ctx.fillStyle = lifeColor;
                 ctx.shadowBlur = 0;
-                ctx.fillText(this.life, 0, 0);
+                ctx.fillText(this.life, 0, -8);
+
+                // Nombre Adentro
+                let nameFontSize = this.radius >= 299 ? "16px" : "12px";
+                ctx.font = `bold ${nameFontSize} Arial`;
+                ctx.fillStyle = "white";
+                ctx.strokeText(this.uniqueId, 0, 10);
+                ctx.fillText(this.uniqueId, 0, 10);
 
                 ctx.restore();
-
-                // Nombre
-                ctx.font = "bold 14px Arial";
-                ctx.fillStyle = "white";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "top";
-                ctx.shadowColor = "black";
-                ctx.shadowBlur = 4;
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = "black";
-                ctx.strokeText(this.uniqueId, this.x, this.y + this.radius + 5);
-                ctx.fillText(this.uniqueId, this.x, this.y + this.radius + 5);
-                ctx.shadowBlur = 0;
 
                 // Dibujar corona si es el jugador con más vida
                 let highestLifePlayer = getPlayerWithHighestLife();
@@ -739,32 +1064,55 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Paredes
-                let hitWall = false;
-                if (this.x - this.radius < 0) {
-                    this.x = this.radius;
-                    this.vx *= -1;
-                    hitWall = true;
-                } else if (this.x + this.radius > canvas.width) {
-                    this.x = canvas.width - this.radius;
-                    this.vx *= -1;
-                    hitWall = true;
-                }
+                // Paredes - ELIPSE DE NEÓN (Más ancho que alto)
+                let cx = canvas.width / 2;
+                let cy = (canvas.height + 70) / 2;
+                
+                let radiusX = (canvas.width / 2) - 20;
+                let radiusY = Math.min((canvas.height - 70) / 2 - 20, radiusX * 0.7); // Altura contenida
+                radiusX = Math.max(radiusX, 150);
+                radiusY = Math.max(radiusY, 100);
 
-                const topBarHeight = 70;
-                if (this.y - this.radius < topBarHeight) {
-                    this.y = topBarHeight + this.radius;
-                    this.vy *= -1;
-                    hitWall = true;
-                } else if (this.y + this.radius > canvas.height) {
-                    this.y = canvas.height - this.radius;
-                    this.vy *= -1;
+                let dx = this.x - cx;
+                let dy = this.y - cy;
+                
+                // Distancia elíptica normalizada: (x^2/a^2) + (y^2/b^2)
+                let normRadius = Math.sqrt((dx * dx) / (radiusX * radiusX) + (dy * dy) / (radiusY * radiusY));
+
+                let hitWall = false;
+
+                if (normRadius > 1.0) {
+                    // Normal de la elipse en el punto de contacto: (2x/a^2, 2y/b^2)
+                    let nx = (dx / (radiusX * radiusX));
+                    let ny = (dy / (radiusY * radiusY));
+                    let len = Math.sqrt(nx * nx + ny * ny);
+                    nx /= len;
+                    ny /= len;
+
+                    // Ajustar posición para quedar adentro (aproximado)
+                    this.x = cx + (dx / normRadius);
+                    this.y = cy + (dy / normRadius);
+
+                    // Reflejar velocidad sobre la normal
+                    let dot = this.vx * nx + this.vy * ny;
+                    this.vx = this.vx - 2 * dot * nx;
+                    this.vy = this.vy - 2 * dot * ny;
+
                     hitWall = true;
                 }
 
                 if (hitWall) {
-                    this.takeDamage();
                     boingSound.cloneNode(true).play().catch(e => console.log(e));
+                    
+                    // Chispas tipo sierra al chocar contra la orilla
+                    let colX = this.x;
+                    let colY = this.y;
+                    for (let k = 0; k < 4; k++) { // Menos chispas
+                        let p = new Particle(colX, colY, "#00FFFF"); // Azul Neón
+                        p.vx += this.vx * 0.5 + (Math.random() - 0.5) * 4;
+                        p.vy += this.vy * 0.5 + (Math.random() - 0.5) * 4;
+                        particles.push(p);
+                    }
                 }
 
                 if (this.isGlow) {
@@ -782,6 +1130,7 @@
                 if (this.isMagnetized && Date.now() > this.magnetEndTime) {
                     this.isMagnetized = false;
                     this.magnetOwner = null;
+                    this.magnetDamageTimer = 0;
                     this.vx = this.originalVx;
                     this.vy = this.originalVy;
                 }
@@ -795,6 +1144,30 @@
                 if (this.isFrozen && Date.now() > this.freezeEndTime) {
                     this.isFrozen = false;
                     this.freezeDamageTimer = 0;
+                }
+
+                // Verificar si el escudo ha expirado
+                if (this.hasShield && Date.now() > this.shieldEndTime) {
+                    this.hasShield = false;
+                    this.shieldEndTime = 0;
+                    this.shieldAnimationTime = 0;
+                }
+
+                // Verificar si el aura dorada ha expirado
+                if (this.hasGoldenAura && Date.now() > this.goldenAuraEndTime) {
+                    this.hasGoldenAura = false;
+                    this.goldenAuraEndTime = 0;
+                }
+
+                // Actualizar animación del escudo
+                if (this.hasShield) {
+                    this.shieldAnimationTime += 0.05;
+                }
+
+                // Verificar y actualizar rotación de espinas (AHORA SON PERMANENTES)
+                if (this.spikeCount > 0) {
+                    // Rotar para efecto de motosierra continua
+                    this.spikeAngle += 0.05;
                 }
             }
         }
@@ -817,20 +1190,50 @@
                     let minDist = b1.radius + b2.radius;
 
                     if (distance < minDist) {
-                        // Sonido de colisión
-                        boingSound.cloneNode(true).play().catch(e => console.log(e));
+                        // Sonido de colisión física (rebote normal) ELIMINADO: boingSound.cloneNode(true).play()
 
-                        // Aplicar daño con multiplicador si está powered
-                        let damage1 = b1.isPowered ? 3 : 1;
-                        let damage2 = b2.isPowered ? 3 : 1;
+                        // 💥 EFECTO CHISPAS (BEYBLADE TRAIL SUTIL) AL CHOCAR 💥
+                        let colX = b1.x + (dx / distance) * b1.radius;
+                        let colY = b1.y + (dy / distance) * b1.radius;
 
-                        // Aplicar daño a cada jugador
-                        for (let i = 0; i < damage1; i++) b1.takeDamage();
-                        for (let i = 0; i < damage2; i++) b2.takeDamage();
+                        // Efecto sierra trompo giratorio - Menos chispas, puramente Azul Neón
+                        for (let k = 0; k < 4; k++) {
+                            let p1 = new Particle(colX, colY, "#00FFFF"); // Azul Neón Fuerte
+                            
+                            // Disparamos partículas perpelinduculares a la colisión para efecto "sierra" tangencial
+                            let tangentX = -dy / distance;
+                            let tangentY = dx / distance;
+                            let dir = (Math.random() > 0.5 ? 1 : -1);
+                            p1.vx = tangentX * dir * (Math.random() * 5 + 2) + b1.vx * 0.5; 
+                            p1.vy = tangentY * dir * (Math.random() * 5 + 2) + b1.vy * 0.5;
+                            particles.push(p1);
+                            
+                            if (Math.random() < 0.3) {
+                                let p2 = new Particle(colX, colY, "#00BFFF"); // Celeste más oscuro
+                                p2.vx = tangentX * dir * (Math.random() * 5 + 3) + b1.vx * 0.5;
+                                p2.vy = tangentY * dir * (Math.random() * 5 + 3) + b1.vy * 0.5;
+                                particles.push(p2);
+                            }
+                        }
 
-                        // Registrar atacante (último contacto)
-                        b1.lastAttackerId = b2.uniqueId;
-                        b2.lastAttackerId = b1.uniqueId;
+                        // Aplicar daño SOLO si hay espinas involucradas
+                        // Tomamos un margen ligeramente mayor para verificar daño de espinas (15px de espina)
+                        let spikeArea1 = minDist + (b1.spikeCount > 0 ? 15 : 0);
+                        let spikeArea2 = minDist + (b2.spikeCount > 0 ? 15 : 0);
+
+                        // Si B1 tiene espinas y alcanza a tocar a B2
+                        if (distance <= spikeArea1 && b1.spikeCount > 0) {
+                            let dmg = b1.spikeType === "fire" ? 20 : 2;
+                            b2.takeDamage(dmg);
+                            b2.lastAttackerId = b1.uniqueId;
+                        }
+
+                        // Si B2 tiene espinas y alcanza a tocar a B1
+                        if (distance <= spikeArea2 && b2.spikeCount > 0) {
+                            let dmg = b2.spikeType === "fire" ? 20 : 2;
+                            b1.takeDamage(dmg);
+                            b1.lastAttackerId = b2.uniqueId;
+                        }
 
                         // Si uno tiene boost, empuja con más fuerza (masa efectiva mayor para el calculo?)
                         // O simplemente la velocidad alta ya hace el trabajo.
@@ -877,7 +1280,11 @@
         }
 
         /* ========== EVENTOS TIKTOK ========== */
-        connection.on("member", data => spawnBall(data.uniqueId, data.profilePictureUrl));
+        let userCountryMap = {}; // Mapa para asociar viewers con países
+
+        connection.on("member", data => {
+            // Disabled normal spawns
+        });
 
         // FOLLOW -> +20 Vida
         connection.on("social", data => {
@@ -886,27 +1293,53 @@
                 if (b) {
                     b.heal(20);
                     followSound.cloneNode(true).play().catch(e => console.log(e));
-                } else {
-                    spawnBall(data.uniqueId, data.profilePictureUrl);
-                }
-            }
-            if (data.displayType && data.displayType.includes("share")) {
-                // Solo revivir si NO existe. 
-                // Si existe, no hacemos nada (sin brillo ni texto, como pidió el usuario).
-                let existing = balls.find(b => b.uniqueId === data.uniqueId);
-                if (!existing) {
-                    spawnBall(data.uniqueId, data.profilePictureUrl);
                 }
             }
         });
 
+        function showJoinNotification(username, country) {
+            let container = document.getElementById("join-notifications");
+            let toast = document.createElement("div");
+            toast.className = "join-toast";
+            toast.innerText = `${username} se ha unido a ${country}`;
+            container.appendChild(toast);
+
+            // Eliminar elemento del DOM después de 2.1 segundos para cuadrar con la animación CSS
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.parentElement.removeChild(toast);
+                }
+            }, 2100);
+        }
+
         connection.on("chat", data => {
-            // console.log("Chat:", data.comment);
+            let msg = data.comment.trim().toLowerCase();
+            let matchedCountry = countries.find(c => c.id.toLowerCase() === msg || (c.aliases && c.aliases.includes(msg)));
+
+            if (matchedCountry) {
+                userCountryMap[data.uniqueId] = matchedCountry.id;
+
+                // Si el país había muerto, revivirlo con 100 de vida (no 150)
+                let existingBall = balls.find(b => b.uniqueId === matchedCountry.id);
+                if (!existingBall) {
+                    let ball = new Ball(matchedCountry.id, matchedCountry.flag);
+                    ball.life = 100;
+                    balls.push(ball);
+                    spawnSound.cloneNode(true).play().catch(e => console.log(e));
+                }
+
+                // Usar el nuevo sistema de notificaciones inferiores en vez de textos flotantes
+                showJoinNotification(data.uniqueId, matchedCountry.id);
+            }
         });
 
         // LIKE -> Cada 40 likes +13 vida
         connection.on("like", data => {
-            let b = balls.find(ball => ball.uniqueId === data.uniqueId);
+            let userCountryId = userCountryMap[data.uniqueId];
+            if (!userCountryId) return; // Ignorar likes si no se ha unido a un país
+
+            // Buscar la bola del país, no la del usuario
+            let b = balls.find(ball => ball.uniqueId === userCountryId);
             if (b) {
                 let likes = data.likeCount || 0;
                 b.likeCount += likes;
@@ -921,49 +1354,44 @@
         });
 
         connection.on("gift", data => {
-            let sender = balls.find(ball => ball.uniqueId === data.uniqueId);
+            let userCountryId = userCountryMap[data.uniqueId];
+            if (!userCountryId) return; // Ignorar regalos de usuarios sin país
 
-            // Si no existe, crearlo
-            if (!sender) {
-                spawnBall(data.uniqueId, data.profilePictureUrl);
-                sender = balls.find(ball => ball.uniqueId === data.uniqueId);
-            }
+            let sender = balls.find(ball => ball.uniqueId === userCountryId);
 
             if (sender && !data.repeatEnd) {
                 if (data.giftId === 5655) {
-                    // Daño Global
+                    // ESPINAS ROTATORIAS acumulables (max 6)
                     damageGlobalSound.cloneNode(true).play().catch(e => console.log(e));
-                    balls.forEach(target => {
-                        if (target !== sender) {
-                            target.forceDamage(1);
-                        }
-                    });
-                } else if (data.giftId === 5269) {
+                    if (sender.spikeCount < 6) {
+                        sender.spikeCount++;
+                        sender.spikeType = "normal";
+                    }
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡ESPINAS ROJAS!", "#FF0000"));
+                } else if (data.giftId === 8913) {
+                    // ROSA - 6 Espinas giratorias PERMANENTES
+                    spikeSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.spikeCount = 6;
+                    sender.spikeType = "rosa";
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡6 ESPINAS ROSAS!", "#FF1493"));
+                } else if (data.giftId === 6267) {
+                    // FUEGO - 7 Espinas giratorias PERMANENTES (Daño 20)
+                    spikeSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.spikeCount = 7;
+                    sender.spikeType = "fire";
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡ESPINAS DE FUEGO!", "#FF8C00"));
+                } else if (data.giftId === 5879) {
+                    // ESCUDO - Invulnerabilidad por 2 minutos
+                    auraSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.hasShield = true;
+                    sender.shieldEndTime = Date.now() + 120000; // 2 minutos
+                    sender.shieldAnimationTime = 0;
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡ESCUDO ACTIVADO!", "#00AAFF"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "2 minutos de protección", "#0088FF"));
+                } else if (data.giftId === 5582) {
                     // CURA MASIVA (+100 VIDAS)
                     healMassiveSound.cloneNode(true).play().catch(e => console.log(e));
                     sender.heal(100);
-                } else if (data.giftId === 7934) {
-                    // AURA DORADA INFINTA
-                    auraSound.cloneNode(true).play().catch(e => console.log(e));
-                    sender.hasGoldenAura = true;
-                    sender.heal(20);
-                } else if (data.giftId === 5879) {
-                    // WIPEOUT (Desaparecer a todos menos al sender)
-                    wipeoutSound.cloneNode(true).play().catch(e => console.log(e));
-                    balls.forEach(target => {
-                        if (target !== sender) {
-                            target.life = 0; // Matar (el loop principal crea la explosión)
-                            target.lastAttackerId = sender.uniqueId;
-                            texts.push(new FloatingText(target.x, target.y, "☠️", "#FF0000"));
-                        }
-                    });
-                    // Efecto visual para el sender
-                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 20, "¡WIPEOUT!", "#FFD700"));
-                } else if (data.giftId === 5487) {
-                    // LASER BEAM (Rayo con rebote)
-                    laserSound.cloneNode(true).play().catch(e => console.log(e));
-                    // Dirección: Velocidad actual o Aleatoria
-                    let angle = Math.atan2(sender.vy, sender.vx);
                     if (sender.vx === 0 && sender.vy === 0) angle = Math.random() * Math.PI * 2;
 
                     lasers.push(new Laser(sender.x, sender.y, angle, sender.uniqueId));
@@ -977,6 +1405,62 @@
                     sender.heal(50);
                     texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡PODER AUMENTADO!", "#FF6600"));
                     texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "Daño x3 por 40s", "#FF3300"));
+                } else if (data.giftId === 5658) {
+                    // LASER DOBLE
+                    laserSound.cloneNode(true).play().catch(e => console.log(e));
+
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+                    let targets = [];
+                    let availableTargets = [...rivals];
+
+                    for (let i = 0; i < Math.min(2, availableTargets.length); i++) {
+                        let randomIndex = Math.floor(Math.random() * availableTargets.length);
+                        targets.push(availableTargets[randomIndex]);
+                        availableTargets.splice(randomIndex, 1);
+                    }
+
+                    targets.forEach(target => {
+                        let angle = Math.atan2(target.y - sender.y, target.x - sender.x);
+                        lasers.push(new Laser(sender.x, sender.y, angle, sender.uniqueId));
+                        target.forceDamage(50);
+                        target.lastAttackerId = sender.uniqueId;
+                        for (let k = 0; k < 10; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
+                        }
+                    });
+
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡LASER DOBLE! (${targets.length})`, "#FF00FF"));
+                } else if (data.giftId === 5660) {
+                    // IMÁN - Atrae a 3 rivales al azar por 3s y les quita 50 de vida
+                    imanSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.heal(100);
+
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+                    let targets = [];
+                    let availableTargets = [...rivals];
+
+                    for (let i = 0; i < Math.min(3, availableTargets.length); i++) {
+                        let randomIndex = Math.floor(Math.random() * availableTargets.length);
+                        targets.push(availableTargets[randomIndex]);
+                        availableTargets.splice(randomIndex, 1);
+                    }
+
+                    targets.forEach(target => {
+                        target.originalVx = target.vx;
+                        target.originalVy = target.vy;
+                        target.isMagnetized = true;
+                        target.magnetOwner = sender.uniqueId;
+                        target.magnetEndTime = Date.now() + 3000; // 3 segundos
+
+                        target.forceDamage(50);
+                        target.lastAttackerId = sender.uniqueId;
+
+                        for (let k = 0; k < 5; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
+                        }
+                    });
+
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡IMÁN! (${targets.length})`, "#FF00FF"));
                 } else if (data.giftId === 7032) {
                     // ATAQUE A 5 RIVALES ALEATORIOS - 3 de daño a cada uno
                     balaSound.cloneNode(true).play().catch(e => console.log(e));
@@ -1010,68 +1494,140 @@
 
                     // Texto de confirmación
                     texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡ATAQUE! (${targets.length})`, "#FF0000"));
-                } else if (data.giftId === 14488) {
-                    // IMÁN DE RIVALES - Atrae a todos los rivales por 3s y les quita 70% de vida
-                    imanSound.cloneNode(true).play().catch(e => console.log(e));
-
-                    // Atraer a todos los rivales
-                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
-
-                    rivals.forEach(target => {
-                        // Guardar velocidad original
-                        target.originalVx = target.vx;
-                        target.originalVy = target.vy;
-
-                        // Marcar como magnetizado
-                        target.isMagnetized = true;
-                        target.magnetOwner = sender.uniqueId;
-                        target.magnetEndTime = Date.now() + 3000; // 3 segundos
-
-                        // Aplicar 70% de daño
-                        let damageAmount = Math.floor(target.life * 0.7);
-                        for (let i = 0; i < damageAmount; i++) {
-                            target.takeDamage();
-                        }
-                        target.lastAttackerId = sender.uniqueId;
-
-                        // Texto de daño
-                        texts.push(new FloatingText(target.x, target.y - target.radius, `-${damageAmount}`, "#FF00FF"));
-
-                        // Efectos visuales
-                        for (let k = 0; k < 5; k++) {
-                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
-                        }
-                    });
-
-                    // Texto de confirmación
-                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡IMÁN! (${rivals.length})`, "#FF00FF"));
                 } else if (data.giftId === 6427) {
-                    // SIUUU - Velocidad aumentada por 1min y congela a rivales por 25s
-                    siuSound.cloneNode(true).play().catch(e => console.log(e));
+                    // LÁSER MULTIPLE - 1 Láser a 8 países (quita 10% de vida) - 3 Ráfagas
+                    laserSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.heal(100);
 
-                    // Dar velocidad aumentada al sender por 1 minuto
+                    // Función para disparar una ráfaga
+                    const fireLaserWave = (waveIndex) => {
+                        // Rescatamos al sender por si muere en el intermedio (aunque es poco probable)
+                        let currentSender = balls.find(b => b.uniqueId === sender.uniqueId);
+                        if (!currentSender && waveIndex > 0) return;
+
+                        if (waveIndex > 0) {
+                            // Sonido para las ráfagas secundarias
+                            laserSound.cloneNode(true).play().catch(e => console.log(e));
+                        }
+
+                        let rivals = balls.filter(b => (currentSender ? b.uniqueId !== currentSender.uniqueId : true));
+                        let targets = [];
+                        let availableTargets = [...rivals];
+
+                        // Seleccionar 8 rivales aleatorios
+                        for (let i = 0; i < Math.min(8, availableTargets.length); i++) {
+                            let randomIndex = Math.floor(Math.random() * availableTargets.length);
+                            targets.push(availableTargets[randomIndex]);
+                            availableTargets.splice(randomIndex, 1);
+                        }
+
+                        targets.forEach(target => {
+                            let currSender = currentSender || sender;
+                            let currentTarget = balls.find(b => b.uniqueId === target.uniqueId);
+
+                            if (currSender && currentTarget) {
+                                let angle = Math.atan2(currentTarget.y - currSender.y, currentTarget.x - currSender.x);
+                                lasers.push(new Laser(currSender.x, currSender.y, angle, currSender.uniqueId));
+
+                                // Aplicar daño del 10%
+                                if (!currentTarget.hasShield) {
+                                    let damageAmount = Math.floor(currentTarget.life * 0.10);
+                                    currentTarget.forceDamage(damageAmount);
+                                    currentTarget.lastAttackerId = currSender.uniqueId;
+                                }
+
+                                // Efectos visuales de impacto
+                                for (let k = 0; k < 5; k++) {
+                                    particles.push(new Particle(currentTarget.x, currentTarget.y, "#FF0000"));
+                                }
+                            }
+                        });
+                        
+                        if (waveIndex === 0) {
+                            // Textos de confirmación (sólo en el disparo 1)
+                            texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡LÁSER MASIVO X3!", "#FF0000"));
+                            texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, `Objetivos: ${targets.length}`, "#FF3333"));
+                        }
+                    };
+
+                    // Disparar las 3 ráfagas con medio segundo decimal de diferencia
+                    fireLaserWave(0);
+                    setTimeout(() => fireLaserWave(1), 500);
+                    setTimeout(() => fireLaserWave(2), 1000);
+
+                } else if (data.giftId === 7934) {
+                    // AURA DORADA - 6 MINUTOS (360,000 ms)
+                    auraSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.hasGoldenAura = true;
+                    sender.goldenAuraEndTime = Date.now() + 360000; // 6 minutos
+                    
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡AURA SUPREMA!", "#FFD700"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "6 Minutos de Resplandor", "#FFA500"));
+
+                } else if (data.giftId === 7168) {
+                    // WIPEOUT GALAXY BOMBA - Mueren todos sin escudo
+                    let wipeoutAudio = wipeoutSound.cloneNode(true);
+                    wipeoutAudio.play().catch(e => console.log(e));
+
+                    // Al terminar wipeout.mp3 suena galaxy.mp3
+                    wipeoutAudio.onended = () => {
+                        galaxySound.cloneNode(true).play().catch(e => console.log(e));
+                    };
+
+                    // ---- OTORGAR TODOS LOS PODERES AL CREADOR POR 20s ----
+                    sender.hasShield = true;
+                    sender.shieldEndTime = Date.now() + 20000;
+                    sender.shieldAnimationTime = 0;
+
+                    sender.isPowered = true;
+                    sender.powerEndTime = Date.now() + 20000;
+                    sender.damageMultiplier = 3;
+
+                    sender.spikeCount = 7;
+                    sender.spikeType = "fire";
+
                     sender.isSpeedBoosted = true;
-                    sender.speedEndTime = Date.now() + 60000; // 1 minuto
 
-                    // Congelar a todos los rivales por 25 segundos
+                    // Remover spikes y velocidad después de 20s
+                    setTimeout(() => {
+                        let currentSender = balls.find(b => b.uniqueId === sender.uniqueId);
+                        if (currentSender) {
+                            currentSender.isSpeedBoosted = false;
+                            currentSender.spikeCount = 0;
+                        }
+                    }, 20000);
+
                     let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+                    let killedCount = 0;
 
                     rivals.forEach(target => {
-                        target.isFrozen = true;
-                        target.freezeEndTime = Date.now() + 25000; // 25 segundos
-                        target.freezeDamageTimer = Date.now(); // Iniciar timer para daño por segundo
-                        target.lastAttackerId = sender.uniqueId;
+                        if (!target.hasShield) {
+                            // Muerte instantánea
+                            target.life = 0;
+                            target.lastAttackerId = sender.uniqueId;
+                            killedCount++;
 
-                        // Efectos visuales de congelación
-                        for (let k = 0; k < 5; k++) {
-                            particles.push(new Particle(target.x, target.y, "#00FFFF"));
+                            // Efecto de desvanecimiento "bomba galaxia"
+                            for (let i = 0; i < 40; i++) {
+                                let p = new Particle(target.x, target.y, target.color);
+                                p.size = Math.random() * 8 + 4; // Partículas más grandes
+                                p.decay = Math.random() * 0.01 + 0.005; // Duran más (estelas)
+                                p.vx *= 2; // Más explosivas
+                                p.vy *= 2;
+                                particles.push(p);
+
+                                // Partículas de galaxia (blancas/púrpuras)
+                                if (Math.random() > 0.5) {
+                                    let pStar = new Particle(target.x, target.y, "#FFFFA0");
+                                    pStar.decay = 0.005;
+                                    particles.push(pStar);
+                                }
+                            }
                         }
                     });
 
-                    // Textos de confirmación
-                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡SIUUUU!", "#00FFFF"));
-                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, "¡VELOCIDAD MÁXIMA!", "#00AAFF"));
-                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 50, `¡CONGELADOS! (${rivals.length})`, "#00FFFF"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡BOMBA GALAXY!", "#8A2BE2"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, `Eliminados: ${killedCount}`, "#FF00FF"));
                 } else {
                     // console.log("Gift desconocido:", data.giftId);
                 }
@@ -1088,13 +1644,38 @@
         function loop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Grid
-            ctx.strokeStyle = "#1a1a1a";
-            ctx.lineWidth = 1;
+            // Fondo oscuro base para contraste
+            ctx.fillStyle = "rgba(10, 10, 15, 1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // ELIPSE NEÓN (Área de Juego más ancha que alta)
+            let cx = canvas.width / 2;
+            let cy = (canvas.height + 70) / 2;
+            let radiusX = (canvas.width / 2) - 20;
+            let radiusY = Math.min((canvas.height - 70) / 2 - 20, radiusX * 0.7); // 70% del ancho máximo de alto
+            radiusX = Math.max(radiusX, 150);
+            radiusY = Math.max(radiusY, 100);
+
+            ctx.save();
             ctx.beginPath();
-            for (let x = 0; x < canvas.width; x += 100) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
-            for (let y = 0; y < canvas.height; y += 100) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
+            ctx.ellipse(cx, cy, radiusX, radiusY, 0, 0, Math.PI * 2);
+            // Sombra Neon
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = "#00FFFF";
+            ctx.strokeStyle = "#00FFFF";
+            ctx.lineWidth = 6;
             ctx.stroke();
+
+            // Centro blanco resaltado
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Fondo interior tenuemente azulado
+            ctx.fillStyle = "rgba(0, 255, 255, 0.05)";
+            ctx.fill();
+            ctx.restore();
 
             // Actualizar Bolas y Textos
             balls.forEach(b => b.update());
@@ -1118,6 +1699,18 @@
                             // Aplicar velocidad hacia el owner
                             ball.vx = nx;
                             ball.vy = ny;
+                        }
+                    }
+
+                    // Aplicar 5 daño cada segundo (Total 50 en 10s)
+                    if (Date.now() - ball.magnetDamageTimer >= 1000) {
+                        ball.takeDamage(5);
+                        ball.magnetDamageTimer = Date.now();
+                        texts.push(new FloatingText(ball.x, ball.y - ball.radius, "-5🧲", "#FF00FF"));
+
+                        // Efecto visual de daño por imán
+                        for (let k = 0; k < 2; k++) {
+                            particles.push(new Particle(ball.x, ball.y, "#FF00FF"));
                         }
                     }
                 }
@@ -1155,38 +1748,9 @@
             for (let i = balls.length - 1; i >= 0; i--) {
                 if (balls[i].life <= 0) {
 
-                    // ----- GUARDAR HISTÓRICO DE SUPERVIVENCIA -----
-                    let deadPlayerTime = {
-                        uniqueId: balls[i].uniqueId,
-                        survivalTime: Date.now() - balls[i].spawnTime,
-                        spawnTime: balls[i].spawnTime
-                    };
-
-                    let existingTimeRecord = survivalHallOfFame.find(p => p.uniqueId === deadPlayerTime.uniqueId);
-                    if (!existingTimeRecord || deadPlayerTime.survivalTime > existingTimeRecord.survivalTime) {
-                        survivalHallOfFame = survivalHallOfFame.filter(p => p.uniqueId !== deadPlayerTime.uniqueId);
-                        survivalHallOfFame.push(deadPlayerTime);
-                    }
-
-                    // ----- GUARDAR HISTÓRICO DE KILLS -----
-                    let deadPlayerKills = {
-                        uniqueId: balls[i].uniqueId,
-                        kills: balls[i].kills
-                    };
-
-                    let existingKillsRecord = killersHallOfFame.find(p => p.uniqueId === deadPlayerKills.uniqueId);
-                    if (!existingKillsRecord || deadPlayerKills.kills > existingKillsRecord.kills) {
-                        killersHallOfFame = killersHallOfFame.filter(p => p.uniqueId !== deadPlayerKills.uniqueId);
-                        killersHallOfFame.push(deadPlayerKills);
-                    }
-
-                    // Credit Kill logic
-                    if (balls[i].lastAttackerId) {
-                        let killer = balls.find(b => b.uniqueId === balls[i].lastAttackerId);
-                        if (killer) {
-                            killer.kills++;
-                            // Sin cura por kill
-                        }
+                    // Sumar kill al atacante global
+                    if (balls[i].lastAttackerId && globalPlayerStats[balls[i].lastAttackerId]) {
+                        globalPlayerStats[balls[i].lastAttackerId].kills++;
                     }
 
                     spawnExplosion(balls[i].x, balls[i].y, balls[i].color);
@@ -1226,75 +1790,40 @@
         loop();
 
         /* ========== LEADERBOARDS & UI ========== */
-        // Histórico de mejores tiempos de supervivencia
-        let survivalHallOfFame = [];
-        // Histórico de asesinatos (Kills) acumulados a lo largo de la sesión
-        let killersHallOfFame = [];
-
         function updateLeaderboards() {
-            // ----- 1. LÓGICA TOP SUPERVIVENCIA -----
-            // Actualizar tiempos de jugadores vivos
-            let currentPlayers = [...balls].map(b => ({
-                uniqueId: b.uniqueId,
-                survivalTime: Date.now() - b.spawnTime,
-                spawnTime: b.spawnTime
-            }));
-
-            // Combinar con el histórico y mantener los mejores tiempos
-            let allSurvivalTimes = [...survivalHallOfFame, ...currentPlayers];
-
-            // Eliminar duplicados (mantener el mejor tiempo de cada jugador)
-            let uniqueBestTimes = {};
-            allSurvivalTimes.forEach(player => {
-                if (!uniqueBestTimes[player.uniqueId] || player.survivalTime > uniqueBestTimes[player.uniqueId].survivalTime) {
-                    uniqueBestTimes[player.uniqueId] = player;
-                }
-            });
-
-            // Convertir a array y ordenar por tiempo de supervivencia (mayor primero)
-            let sortedByTime = Object.values(uniqueBestTimes).sort((a, b) => b.survivalTime - a.survivalTime);
-            let top3Time = sortedByTime.slice(0, 3);
-
-            let htmlTime = "";
-            top3Time.forEach((player, i) => {
-                let seconds = Math.floor(player.survivalTime / 1000);
-                let mins = Math.floor(seconds / 60);
-                let secs = seconds % 60;
-                let timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-                let isAlive = balls.some(b => b.uniqueId === player.uniqueId);
-                let status = isAlive ? "🟢" : "💀";
-                htmlTime += `<li><span class="name">${i + 1}. ${player.uniqueId} ${status}</span> <span>${timeStr}</span></li>`;
-            });
-            document.getElementById("list-survival").innerHTML = htmlTime;
-
-            // ----- 2. LÓGICA TOP KILLERS (ACUMULATIVA/PERSISTENTE) -----
-            // Mapear los kills actuales de los jugadores vivos
-            let currentKills = [...balls].map(b => ({
-                uniqueId: b.uniqueId,
-                kills: b.kills
-            }));
-
-            // Combinar el histórico de muertos con los vivos
-            let allKills = [...killersHallOfFame, ...currentKills];
-
-            let uniqueBestKills = {};
-            allKills.forEach(player => {
-                // Siempre mantenemos el conteo mayor de kills para dicho uniqueId
-                if (!uniqueBestKills[player.uniqueId] || player.kills > uniqueBestKills[player.uniqueId].kills) {
-                    uniqueBestKills[player.uniqueId] = player;
-                }
-            });
-
-            // Ordenar todos los jugadores registrados por la cantidad de Kills
-            let sortedByKills = Object.values(uniqueBestKills).sort((a, b) => b.kills - a.kills);
-            let top5Kills = sortedByKills.slice(0, 5);
-
-            let htmlKills = "";
-            top5Kills.forEach((p, i) => {
-                htmlKills += `<li><span class="name">${i + 1}. ${p.uniqueId}</span> <span>⚔️ ${p.kills}</span></li>`;
-            });
-            document.getElementById("list-killers").innerHTML = htmlKills;
+            // Actualizar contador de jugadores en el tablero
+            $("#players-count").text(balls.length);
+            updateKillersBoard();
         }
+
+        function updateKillersBoard() {
+            // Convertir objeto de stats a array
+            let statsArray = Object.values(globalPlayerStats);
+
+            // Ordenar por cantidad de kills descendente
+            statsArray.sort((a, b) => b.kills - a.kills);
+
+            // Tomar el top 5
+            let top5 = statsArray.slice(0, 5);
+
+            let html = "";
+            top5.forEach((player, index) => {
+                if (player.kills > 0 || index === 0) { // Mostrar al menos 1 o los que tengan kills
+                    html += `
+                        <div class="killer-row">
+                            <div class="killer-info">
+                                <span style="font-weight: bold; margin-right: 8px; color: #aaa;">#${index + 1}</span>
+                                <img src="${player.flag}" alt="${player.name}">
+                                <span>${player.name}</span>
+                            </div>
+                            <span class="killer-score">💀 ${player.kills}</span>
+                        </div>
+                    `;
+                }
+            });
+            $("#killers-list").html(html);
+        }
+
         setInterval(updateLeaderboards, 1000);
 
         // Make Draggable
@@ -1328,8 +1857,354 @@
             }
         }
 
-        makeDraggable(document.getElementById("lb-survival"));
-        makeDraggable(document.getElementById("lb-killers"));
+        makeDraggable(document.getElementById("game-info-board"));
+        makeDraggable(document.getElementById("killers-board"));
+
+        /* ========== CONTADOR Y PODIO ========== */
+        let timerInterval = null;
+        let countdownSeconds = 0;
+
+        $("#timerButton").click(() => {
+            let minutes = parseInt($("#timerMinutes").val());
+            countdownSeconds = minutes * 60;
+
+            $("#game-info-board").addClass("active");
+            updateBoardDisplay();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                countdownSeconds--;
+                if (countdownSeconds <= 0) {
+                    countdownSeconds = 0;
+                    clearInterval(timerInterval);
+                    showPodium();
+                }
+                updateBoardDisplay();
+            }, 1000);
+        });
+
+        function showPodium() {
+            // Detener el loop principal (opcional, o dejarlo correr de fondo)
+
+            let statsArray = Object.values(globalPlayerStats);
+            statsArray.sort((a, b) => b.kills - a.kills);
+            let top5 = statsArray.slice(0, 5);
+
+            let podiumHtml = "";
+            let ranks = [1, 2, 3, 4, 5];
+
+            // Reordenar para efecto visual: Centro(1), Izq(2), Der(3), IzqExt(4), DerExt(5)
+            // Array visual left-to-right: [4, 2, 1, 3, 5]
+            let displayOrder = [3, 1, 0, 2, 4];
+
+            displayOrder.forEach(index => {
+                let p = top5[index];
+                if (p) {
+                    let rankNum = index + 1;
+                    podiumHtml += `
+                        <div class="podium-player rank-${rankNum}">
+                            <img src="${p.flag}" alt="${p.name}">
+                            <div class="podium-rank-box">${rankNum}</div>
+                            <div class="podium-name">${p.name}</div>
+                            <div class="podium-score">💀 ${p.kills}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            $("#podium-container").html(podiumHtml);
+            $("#podium-overlay").css("display", "flex");
+
+            // Ocultar podio después de 15 segundos
+            setTimeout(() => {
+                $("#podium-overlay").fadeOut();
+            }, 15000);
+        }
+
+        function updateBoardDisplay() {
+            let mins = Math.floor(countdownSeconds / 60);
+            let secs = countdownSeconds % 60;
+            let timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            $("#time-display").text(timeStr);
+
+            if (countdownSeconds <= 60 && countdownSeconds > 0) {
+                $("#time-display").css("color", "#FF3333");
+                $("#time-display").css("text-shadow", "0 0 10px rgba(255, 51, 51, 0.8)");
+            } else {
+                $("#time-display").css("color", "#FFD700");
+                $("#time-display").css("text-shadow", "0 0 10px rgba(255, 215, 0, 0.8)");
+            }
+        }
+
+        // ====== CONTROLES DE PRUEBA LOCAL =======
+        document.addEventListener("keydown", e => {
+            // Tecla '2' lanzará el gift ROSA (8913) a un país elegido al azar
+            if (e.key === "2") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let randomTarget = balls[randomIndex];
+
+                    spikeSound.cloneNode(true).play().catch(e => console.log(e));
+                    randomTarget.spikeCount = 6;
+                    randomTarget.spikeType = "rosa";
+                    // Ya no tienen spikesEndTime, son permanentes
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius, "¡6 ESPINAS ROSAS!", "#FF1493"));
+                }
+            }
+
+            // Tecla '7' lanzará el gift FUEGO (6267) a un país elegido al azar
+            if (e.key === "7") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let randomTarget = balls[randomIndex];
+
+                    spikeSound.cloneNode(true).play().catch(e => console.log(e));
+                    randomTarget.spikeCount = 7;
+                    randomTarget.spikeType = "fire";
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius, "¡ESPINAS DE FUEGO!", "#FF8C00"));
+                }
+            }
+
+            // Tecla '3' lanzará el gift LÁSER DOBLE (5658) a un país aleatorio
+            if (e.key === "3") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let randomTarget = balls[randomIndex];
+
+                    laserSound.cloneNode(true).play().catch(e => console.log(e)); // Sonido!
+
+                    // Obtener rivales (excluyendo al target)
+                    let rivals = balls.filter(b => b.uniqueId !== randomTarget.uniqueId);
+
+                    // Seleccionar 2 rivales aleatorios (o menos si hay menos jugadores)
+                    let targets = [];
+                    let availableTargets = [...rivals];
+
+                    for (let i = 0; i < Math.min(2, availableTargets.length); i++) {
+                        let randomIndex = Math.floor(Math.random() * availableTargets.length);
+                        targets.push(availableTargets[randomIndex]);
+                        availableTargets.splice(randomIndex, 1);
+                    }
+
+                    // Crear láseres dobles hacia cada objetivo
+                    targets.forEach(target => {
+                        let angle = Math.atan2(target.y - randomTarget.y, target.x - randomTarget.x);
+                        lasers.push(new Laser(randomTarget.x, randomTarget.y, angle, randomTarget.uniqueId));
+
+                        // Aplicar 50 de daño inmediato (respetará el escudo gracias a modificaciones anteriores)
+                        target.forceDamage(50);
+                        target.lastAttackerId = randomTarget.uniqueId;
+
+                        // Efectos visuales de impacto
+                        for (let k = 0; k < 10; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
+                        }
+                    });
+
+                    // Texto de confirmación
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius, `¡LASER DOBLE! (${targets.length})`, "#FF00FF"));
+                }
+            }
+
+            // Tecla '4' lanzará el gift ESCUDO (5879) a un país aleatorio
+            if (e.key === "4") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let randomTarget = balls[randomIndex];
+
+                    auraSound.cloneNode(true).play().catch(e => console.log(e));
+
+                    randomTarget.hasShield = true;
+                    randomTarget.shieldEndTime = Date.now() + 120000; // 2 minutos
+                    randomTarget.shieldAnimationTime = 0;
+
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius, "¡ESCUDO ACTIVADO!", "#00AAFF"));
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius - 25, "2 minutos de protección", "#0088FF"));
+                }
+            }
+
+            // Tecla '5' lanzará el gift IMÁN (5660) a un país aleatorio
+            if (e.key === "5") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let sender = balls[randomIndex];
+
+                    imanSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.heal(100);
+
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+                    let targets = [];
+                    let availableTargets = [...rivals];
+
+                    for (let i = 0; i < Math.min(3, availableTargets.length); i++) {
+                        let randIndex = Math.floor(Math.random() * availableTargets.length);
+                        targets.push(availableTargets[randIndex]);
+                        availableTargets.splice(randIndex, 1);
+                    }
+
+                    targets.forEach(target => {
+                        target.originalVx = target.vx;
+                        target.originalVy = target.vy;
+                        target.isMagnetized = true;
+                        target.magnetOwner = sender.uniqueId;
+                        target.magnetEndTime = Date.now() + 10000; // 10 segundos
+                        target.magnetDamageTimer = Date.now();
+
+                        target.lastAttackerId = sender.uniqueId;
+
+                        for (let k = 0; k < 5; k++) {
+                            particles.push(new Particle(target.x, target.y, "#FF00FF"));
+                        }
+                    });
+
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, `¡IMÁN ACTIVADO! (${targets.length})`, "#FF00FF"));
+                }
+            }
+
+            // Tecla '6' lanzará el gift 6427 (LÁSER PARA TODOS x3, 8 PAÍSES)
+            if (e.key === "6") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let sender = balls[randomIndex];
+
+                    laserSound.cloneNode(true).play().catch(e => console.log(e));
+                    sender.heal(100);
+
+                    // Función para disparar una ráfaga (test)
+                    const fireLaserWaveTest = (waveIndex) => {
+                        let currentSender = balls.find(b => b.uniqueId === sender.uniqueId);
+                        if (!currentSender && waveIndex > 0) return;
+
+                        if (waveIndex > 0) {
+                            laserSound.cloneNode(true).play().catch(e => console.log(e));
+                        }
+
+                        let rivals = balls.filter(b => (currentSender ? b.uniqueId !== currentSender.uniqueId : true));
+                        let targets = [];
+                        let availableTargets = [...rivals];
+
+                        for (let i = 0; i < Math.min(8, availableTargets.length); i++) {
+                            let randIndex = Math.floor(Math.random() * availableTargets.length);
+                            targets.push(availableTargets[randIndex]);
+                            availableTargets.splice(randIndex, 1);
+                        }
+
+                        targets.forEach(target => {
+                            let currSender = currentSender || sender;
+                            let currentTarget = balls.find(b => b.uniqueId === target.uniqueId);
+
+                            if (currSender && currentTarget) {
+                                let angle = Math.atan2(currentTarget.y - currSender.y, currentTarget.x - currSender.x);
+                                lasers.push(new Laser(currSender.x, currSender.y, angle, currSender.uniqueId));
+
+                                if (!currentTarget.hasShield) {
+                                    let damageAmount = Math.floor(currentTarget.life * 0.10);
+                                    currentTarget.forceDamage(damageAmount);
+                                    currentTarget.lastAttackerId = currSender.uniqueId;
+                                }
+
+                                for (let k = 0; k < 5; k++) {
+                                    particles.push(new Particle(currentTarget.x, currentTarget.y, "#FF0000"));
+                                }
+                            }
+                        });
+                        
+                        if (waveIndex === 0) {
+                            texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡LÁSER MASIVO X3!", "#FF0000"));
+                            texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, `Objetivos: ${targets.length}`, "#FF3333"));
+                        }
+                    };
+
+                    fireLaserWaveTest(0);
+                    setTimeout(() => fireLaserWaveTest(1), 500);
+                    setTimeout(() => fireLaserWaveTest(2), 1000);
+                }
+            }
+
+            // Tecla '8' lanzará el gift 7168 (BOMBA GALAXY) a un país elegido al azar
+            if (e.key === "8") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let sender = balls[randomIndex];
+
+                    let wipeoutAudio = wipeoutSound.cloneNode(true);
+                    wipeoutAudio.play().catch(e => console.log(e));
+
+                    wipeoutAudio.onended = () => {
+                        galaxySound.cloneNode(true).play().catch(e => console.log(e));
+                    };
+
+                    // ---- OTORGAR TODOS LOS PODERES AL CREADOR POR 20s ----
+                    sender.hasShield = true;
+                    sender.shieldEndTime = Date.now() + 20000;
+                    sender.shieldAnimationTime = 0;
+
+                    sender.isPowered = true;
+                    sender.powerEndTime = Date.now() + 20000;
+                    sender.damageMultiplier = 3;
+
+                    sender.spikeCount = 7;
+                    sender.spikeType = "fire";
+
+                    sender.isSpeedBoosted = true;
+
+                    // Remover spikes y velocidad después de 20s
+                    setTimeout(() => {
+                        let currentSender = balls.find(b => b.uniqueId === sender.uniqueId);
+                        if (currentSender) {
+                            currentSender.isSpeedBoosted = false;
+                            currentSender.spikeCount = 0;
+                        }
+                    }, 20000);
+
+                    let rivals = balls.filter(b => b.uniqueId !== sender.uniqueId);
+                    let killedCount = 0;
+
+                    rivals.forEach(target => {
+                        if (!target.hasShield) {
+                            target.life = 0;
+                            target.lastAttackerId = sender.uniqueId;
+                            killedCount++;
+
+                            for (let i = 0; i < 40; i++) {
+                                let p = new Particle(target.x, target.y, target.color);
+                                p.size = Math.random() * 8 + 4;
+                                p.decay = Math.random() * 0.01 + 0.005;
+                                p.vx *= 2;
+                                p.vy *= 2;
+                                particles.push(p);
+
+                                if (Math.random() > 0.5) {
+                                    let pStar = new Particle(target.x, target.y, "#FFFFA0");
+                                    pStar.decay = 0.005;
+                                    particles.push(pStar);
+                                }
+                            }
+                        }
+                    });
+
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius, "¡BOMBA GALAXY!", "#8A2BE2"));
+                    texts.push(new FloatingText(sender.x, sender.y - sender.radius - 25, `Eliminados: ${killedCount}`, "#FF00FF"));
+                }
+            }
+
+            // Tecla '9' lanzará el gift AURA DORADA (7934) a un país elegido al azar
+            if (e.key === "9") {
+                if (balls.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * balls.length);
+                    let randomTarget = balls[randomIndex];
+
+                    auraSound.cloneNode(true).play().catch(e => console.log(e));
+                    
+                    randomTarget.hasGoldenAura = true;
+                    randomTarget.goldenAuraEndTime = Date.now() + 360000; // 6 minutos
+                    
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius, "¡AURA SUPREMA!", "#FFD700"));
+                    texts.push(new FloatingText(randomTarget.x, randomTarget.y - randomTarget.radius - 25, "6 Minutos de Resplandor", "#FFA500"));
+                }
+            }
+
+        });
 
     </script>
 </body>
